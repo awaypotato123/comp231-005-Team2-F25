@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
-    "client": "npm run dev --prefix clientss",
+    "client": "npm run dev --prefix frontend",
     "server": "npm run dev --prefix backend"
   },
   "devDependencies": {
