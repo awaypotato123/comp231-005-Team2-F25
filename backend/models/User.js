@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import crypto from "crypto"; 
 
-const userSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: [true, "First name is required"],
@@ -23,6 +24,9 @@ const userSchema = new mongoose.Schema({
     required: [true, "Password is required"],
     minlength: 6
   },
+  salt: {
+    type: String,
+  },
   role: {
     type: String,
     enum: ["learner", "teacher", "admin"],
@@ -30,7 +34,7 @@ const userSchema = new mongoose.Schema({
   },
   credits: {
     type: Number,
-    default: 1, 
+    default: 1,
     min: 0
   },
   skills: [
@@ -45,15 +49,34 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-
-  const bcrypt = await import("bcryptjs");
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+UserSchema.pre('save', function(next) {
+  if (this.isModified('password') || this.isNew) {
+    this.salt = this.makeSalt();
+    this.password = this.encryptPassword(this.password); 
+  }
   next();
 });
 
-const User = mongoose.model("User", userSchema);
+UserSchema.methods = {
+  authenticate: function(plainText) {
+    return this.encryptPassword(plainText) === this.password;
+  },
 
-export default User;
+  encryptPassword: function(password) {
+    if (!password || !this.salt) return "";
+    try {
+      return crypto
+        .createHmac("sha1", this.salt) 
+        .update(password) 
+        .digest("hex");
+    } catch (err) {
+      console.error("Error hashing password:", err);
+      return "";
+    }
+  },
+
+  makeSalt: function() {
+    return Math.round(new Date().valueOf() * Math.random()) + "";
+  }
+};
+export default mongoose.model("User", UserSchema);
