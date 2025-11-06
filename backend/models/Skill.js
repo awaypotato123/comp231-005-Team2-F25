@@ -25,4 +25,8 @@ const skillSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
-});
+},
+{timestamps: true}
+);
+
+export default mongoose.model("Skill", skillSchema);
