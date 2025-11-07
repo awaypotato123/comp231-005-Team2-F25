@@ -3,10 +3,12 @@ import User from "../models/User";
 
 export const getAllSkills = async (req, res) => {
     try {
-        const {keyword, category} = req.query;
+        const {keyword, category} = req.query; //for search (optional)
+
+        let query = {};
 
         if(keyword) {
-            query.title = { $regex: keyword, $options: "i"};
+            query.title = { $regex: keyword, $options: "i"}; //case sensitive
         }
 
         if(category) {
