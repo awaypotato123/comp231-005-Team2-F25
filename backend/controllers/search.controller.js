@@ -4,7 +4,16 @@ import User from "../models/User.js";
 export const search = async (req, res) => {
     try {
         const query = req.query.query;
-        const skills = await Skill.find({ name: { $regex: query, $options: "i" } });
+        const category = req.query.category;
+
+        const skillFilter = {
+            name: { $regex: query, $options: "i"}
+        }
+
+        if (category)
+            skillFilter.category = category;
+
+        const skills = await Skill.find(skillFilter);
         const user = await User.find({ name: { $regex: query, $options: "i" } });
 
         res.json({ skills, user });
