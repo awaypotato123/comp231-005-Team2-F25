@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
 export async function register(req, res) {
   try {
@@ -63,6 +64,8 @@ export async function login(req, res) {
       console.log("Password mismatch for user:", email);
       return res.status(400).json({ message: "Invalid credentials." });
     }
+
+    dotenv.config();
 
     const token = jwt.sign(
       { userId: user._id },
