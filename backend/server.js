@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.route.js";
 import skillRoutes from "./routes/skill.route.js";
+import searchRoutes from "./routes/search.route.js";
 import cors from "cors";
 
 
@@ -15,7 +16,8 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/auth", authRoutes);
-app.use("/api/skills", skillRoutes)
+app.use("/api/skills", skillRoutes);
+app.use("/api/search/", searchRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is running...');
