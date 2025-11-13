@@ -65,7 +65,7 @@ export async function login(req, res) {
       return res.status(400).json({ message: "Invalid credentials." });
     }
 
-    dotenv.config();
+
 
     const token = jwt.sign(
       { userId: user._id },

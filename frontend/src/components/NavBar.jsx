@@ -6,9 +6,15 @@ import AuthModal from "./AuthModal";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [isSignUpMode, setIsSignUpMode] = useState(false);
   const [isSignUpSuccessPopup, setIsSignUpSuccessPopup] = useState(false);
   const [isSignInSuccessPopup, setIsSignInSuccessPopup] = useState(false);
   const { user, logout } = useAuth();
+
+  const openSignInModal = () => {
+    setIsSignUpMode(false); // Set to false for Sign In mode
+    setShowAuth(true);
+  };
 
   return (
     <>
@@ -56,7 +62,7 @@ export default function Navbar() {
               {/* Right-side buttons */}
               {!user ? (
                 <button
-                  onClick={() => setShowAuth(true)}
+                  onClick={openSignInModal}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                 >
                   Sign In
@@ -64,7 +70,7 @@ export default function Navbar() {
               ) : (
                 <button
                   onClick={() => {
-                    logout(); // Ensure to logout
+                    logout();
                   }}
                   className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
                 >
@@ -80,7 +86,7 @@ export default function Navbar() {
       <AuthModal
         isOpen={showAuth}
         onClose={() => setShowAuth(false)}
-        isSignUpInitial={false}
+        isSignUpInitial={isSignUpMode}
         setIsSignUpSuccessPopup={setIsSignUpSuccessPopup} 
         setIsSignInSuccessPopup={setIsSignInSuccessPopup}
       />
