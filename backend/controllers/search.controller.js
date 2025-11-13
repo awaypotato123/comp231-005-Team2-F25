@@ -7,7 +7,7 @@ export const search = async (req, res) => {
         const skills = await Skill.find({ name: { $regex: query, $options: "i" } });
         const user = await User.find({ name: { $regex: query, $options: "i" } });
 
-        res.json({ skills, teachers });
+        res.json({ skills, user });
     }
     catch (err) {
         console.error("Error fetching results: ", err);
