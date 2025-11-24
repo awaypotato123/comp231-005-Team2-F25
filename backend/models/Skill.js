@@ -24,6 +24,11 @@ const skillSchema = new mongoose.Schema({
         enum: ["beginner", "intermediate", "advanced"],
         default: "beginner",
     },
+    status: {
+        type: String,
+        enum: ["pending", "approved", "rejected"],
+        default: "pending",
+    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
