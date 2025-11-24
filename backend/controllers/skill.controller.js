@@ -105,3 +105,52 @@ export const getPendingSkills = async (req, res) => {
     res.status(500).json({ message: "Server error fetching skills awaiting approval" });
   }
 }
+
+//Approve Skill
+export const approveSkill = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const skill = await Skill.findByIdAndUpdate(
+      id,
+      { status: "approved" },
+      { new: true}
+    );
+
+    if (!skill) {
+      return res.status(404).json({ message: "Skill not found"});
+    }
+
+    res.status(200).json({
+      message: "Skill approved",
+      skill
+    });
+  } catch (err) {
+    console.error("Error approving skill:", err);
+    res.status(500).json({ message: "Server error approving skill" });
+  }
+}
+
+export const rejectSkill = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const skill = await Skill.findByIdAndUpdate(
+      id,
+      { status: "rejected" },
+      { new: true}
+    );
+
+    if (!skill) {
+      return res.status(404).json({ message: "Skill not found"});
+    }
+
+    res.status(200).json({
+      message: "Skill rejected",
+      skill
+    });
+  } catch (err) {
+    console.error("Error rejecting skill:", err);
+    res.status(500).json({ message: "Server error rejecting skill" });
+  }
+}
