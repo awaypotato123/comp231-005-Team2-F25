@@ -7,10 +7,13 @@ export default function SkillDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+
   const [skill, setSkill] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [requesting, setRequesting] = useState(false);
 
+  // Fetch skill details on mount / id change
   useEffect(() => {
     fetchSkillDetails();
   }, [id]);
@@ -29,10 +32,25 @@ export default function SkillDetail() {
     }
   };
 
+  const handleRequestSkill = async () => {
+    if (!user || !skill?._id) return;
+
+    try {
+      setRequesting(true);
+      await api.post(`/skills/request/${skill._id}`);
+      alert("Your request has been sent successfully!");
+    } catch (err) {
+      console.error("Error requesting skill:", err);
+      alert("Failed to send request. Please try again.");
+    } finally {
+      setRequesting(false);
+    }
+  };
+
   const levelColors = {
     beginner: "bg-green-100 text-green-800",
     intermediate: "bg-yellow-100 text-yellow-800",
-    advanced: "bg-red-100 text-red-800"
+    advanced: "bg-red-100 text-red-800",
   };
 
   if (loading) {
@@ -163,8 +181,12 @@ export default function SkillDetail() {
           <div className="flex gap-4">
             {user ? (
               <>
-                <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition">
-                  Request to Learn
+                <button
+                  onClick={handleRequestSkill}
+                  disabled={requesting}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition disabled:opacity-50"
+                >
+                  {requesting ? "Requesting..." : "Request to Learn"}
                 </button>
                 <button className="px-6 py-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition">
                   Contact Instructor
@@ -182,7 +204,7 @@ export default function SkillDetail() {
           </div>
         </div>
 
-        {/* Related Skills Section (Optional) */}
+        {/* Related Skills Section */}
         <div className="mt-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             More Skills in {skill.category}

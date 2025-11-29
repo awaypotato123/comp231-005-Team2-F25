@@ -183,6 +183,28 @@ export const getUserClasses = async (req, res) => {
     }
 };
 
+// ------------------------------ GET USER-CREATED CLASSES ------------------------------
+export const getMyCreatedClasses = async (req, res) => {
+    try {
+        const userId = req.user.id; // Logged-in user ID
+
+        // Find classes created by this user
+        const classes = await Class.find({ user: userId })
+            .populate('skill', 'title')   // optional
+            .populate('students', 'firstName lastName email'); // optional
+
+        if (!classes.length) {
+            return res.status(404).json({ message: "You haven't created any classes yet" });
+        }
+
+        res.status(200).json(classes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+
 // ------------------------------ GET STUDENTS IN A CLASS ------------------------------
 export const getClassStudents = async (req, res) => {
     try {
@@ -201,5 +223,7 @@ export const getClassStudents = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+
 
 export default router;

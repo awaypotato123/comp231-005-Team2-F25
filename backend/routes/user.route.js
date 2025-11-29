@@ -4,7 +4,8 @@ import {
   updateProfile, 
   updatePassword,
   getUserStats,
-    getPublicUser
+    getPublicUser,
+    updateUserCreds
 } from "../controllers/user.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
@@ -16,5 +17,6 @@ router.put("/profile", protect, updateProfile);
 router.put("/password", protect, updatePassword);
 router.get("/stats", protect, getUserStats);
 router.get("/public/:id", getPublicUser);
+router.put("/update-credits", protect, updateUserCreds);
 
 export default router;

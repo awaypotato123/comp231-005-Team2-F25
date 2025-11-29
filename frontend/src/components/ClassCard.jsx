@@ -3,65 +3,53 @@ import { useAuth } from "../context/AuthContext";
 import api from '../lib/api'
 import { Link } from "react-router-dom";
 
-
 export default function ClassCard({ classData }) {
-  const { title, description, skill, user, userName, maxStudents, rating } = classData;
-  const { userr } = useAuth(); // Check if the user is logged in
+  const { title, description, skill, userName, maxStudents, rating } = classData;
+  const { user, setUser } = useAuth(); // Include setUser to update context
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Function to open the modal
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
 const joinClass = async () => {
+  if (!user) return alert("You must be signed in to join a class.");
+  if (user.credits < 1) return alert("Not enough credits to join this class.");
+
   try {
-    const res = await api.post(`/classes/join/${classData._id}`);
+    // 1️⃣ Join the class
+    const joinRes = await api.post(`/classes/join/${classData._id}`);
+    console.log("Join response:", joinRes.data);
 
-    console.log("Join response:", res.data);
+    // 2️⃣ Deduct 1 credit from the student
+    const newStudentCredits = user.credits - 1;
+    const studentCreditRes = await api.put("/users/update-credits", { credits: newStudentCredits });
+    setUser({ ...user, credits: studentCreditRes.data.credits });
 
-    // You can replace this with your toast if you want
-    alert("Joined class successfully");
+    // 3️⃣ Add 1 credit to the class owner
+    await api.put("/users/update-credits", { userId: classData.user, creditsChange: 1 });
 
+    alert(`Joined class successfully! 1 credit deducted from you and 1 credit added to the instructor.`);
     closeModal();
   } catch (error) {
-    console.error("Error joining class:", error);
-    alert("Could not join this class");
+    console.error("Error joining class or updating credits:", error);
+    alert(error.response?.data?.message || "Could not join this class");
   }
 };
 
-
-
-  // Function to close the modal
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow hover:shadow-md p-4 flex flex-col">
-      {/* Class Title */}
       <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-      
-      {/* Class Skill */}
       <p className="text-sm text-gray-500 mt-1">Skill: {skill.title}</p>
-<Link
-  to={`/profile/${classData.user}`}
-  className="text-sm text-blue-600 mt-2 cursor-pointer hover:underline"
->
-  Instructor: {userName}
-</Link>
-      {/* Class Description */}
+      <Link to={`/profile/${classData.user}`} className="text-sm text-blue-600 mt-2 cursor-pointer hover:underline">
+        Instructor: {userName}
+      </Link>
       <p className="text-sm text-gray-600 mt-2">{description}</p>
-      
-      {/* Instructor and Class Details */}
+
       <div className="mt-3 flex justify-between items-center">
-        <span className="text-blue-600 font-medium">
-          {maxStudents} students max
-        </span>
+        <span className="text-blue-600 font-medium">{maxStudents} students max</span>
         <span className="text-yellow-500 text-sm">⭐ {rating || "N/A"}</span>
       </div>
 
-      {/* View Class Details Button */}
       <div className="mt-4">
         <button
           onClick={openModal}
@@ -71,30 +59,25 @@ const joinClass = async () => {
         </button>
       </div>
 
-      {/* Modal for Class Details */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-2xl w-[80vw] max-w-3xl shadow-lg">
-            {/* Class Details in Modal */}
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">{title}</h3>
             <p className="text-lg text-gray-500 mt-1">Skill: {skill.title}</p>
-            <p className="text-lg text-gray-600 mt-2 underline">Instructor:<Link
-  to={`/profile/${classData.user}`}
-> {userName}
-</Link></p>
+            <p className="text-lg text-gray-600 mt-2 underline">
+              Instructor: <Link to={`/profile/${classData.user}`}>{userName}</Link>
+            </p>
             <p className="text-lg text-gray-600 mt-4">{description}</p>
+
             <div className="mt-4 flex justify-between items-center">
-              <span className="text-blue-600 font-medium">
-                {maxStudents} students max
-              </span>
+              <span className="text-blue-600 font-medium">{maxStudents} students max</span>
               <span className="text-yellow-500 text-lg">⭐ {rating || "N/A"}</span>
             </div>
 
-            {/* Join Class Button or Sign In Prompt */}
             <div className="mt-6 flex justify-end space-x-4">
-              {userr ? (
+              {user ? (
                 <button
-                  onClick={joinClass}// Ideally, this would join the class via an API
+                  onClick={joinClass}
                   className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium"
                 >
                   Join Class

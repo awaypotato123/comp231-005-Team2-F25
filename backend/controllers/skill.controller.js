@@ -100,3 +100,67 @@ export const deleteSkill = async (req, res) => {
         res.status(500).json({ message: "Server error deleting skill" });
     }
 };
+
+export const requestSkill = async (req, res) => {
+  try {
+    const skillId = req.params.skillId;
+    const studentId = req.user.id;
+
+    const skill = await Skill.findById(skillId);
+    if (!skill) return res.status(404).json({ message: "Skill not found" });
+
+    // Add a request to the instructor's pendingRequests array
+    if (!skill.pendingRequests) skill.pendingRequests = [];
+
+    // Optional: prevent duplicate requests
+    if (skill.pendingRequests.find(r => r.student.toString() === studentId)) {
+      return res.status(400).json({ message: "You already requested this skill" });
+    }
+
+    skill.pendingRequests.push({ student: studentId });
+    await skill.save();
+
+    res.status(200).json({ message: "Request sent to instructor" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to request skill" });
+  }
+};
+
+export const getSkillRequests = async (req, res) => {
+  try {
+    const userId = req.user._id; // set by protect middleware
+
+    // Find all skills owned by this user
+    const mySkills = await Skill.find({ userId }).select('_id title');
+
+    if (!mySkills.length) {
+      return res.status(200).json([]); // no skills => no requests
+    }
+
+    const mySkillIds = mySkills.map(skill => skill._id);
+
+    // Fetch all requests for those skills, populate relevant info
+    const requests = await SkillRequest.find({ skillId: { $in: mySkillIds } })
+      .populate('skillId', 'title')        // populate skill title
+      .populate('studentId', 'firstName lastName email') // populate student info
+      .sort({ createdAt: -1 });           // optional: latest requests first
+
+    // Map the response to a clean format
+    const formattedRequests = requests.map(req => ({
+      requestId: req._id,
+      skillId: req.skillId._id,
+      skillTitle: req.skillId.title,
+      studentId: req.studentId._id,
+      studentName: `${req.studentId.firstName} ${req.studentId.lastName}`,
+      studentEmail: req.studentId.email,
+      requestedAt: req.createdAt,
+      status: req.status || 'pending'  // if you have status
+    }));
+
+    res.status(200).json(formattedRequests);
+  } catch (error) {
+    console.error('Error fetching skill requests:', error);
+    res.status(500).json({ message: 'Failed to fetch skill requests' });
+  }
+};

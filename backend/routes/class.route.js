@@ -7,7 +7,8 @@ import {
   deleteClass, 
   joinClass, 
   getUserClasses, 
-  getClassStudents 
+  getClassStudents,
+  getMyCreatedClasses
 } from '../controllers/class.controller.js';  // Import the class controller methods
 import { protect } from '../middleware/auth.middleware.js';  // Import the authentication middleware
 
@@ -20,7 +21,7 @@ router.post('/create', protect, createClass);
 router.get('/', getClasses);
 
 //GET: Get all classes the user has created
-router.get('/', protect, getClasses);
+router.get('/instructor', protect, getMyCreatedClasses);
 
 // GET: Get a single class by classId (authentication required)
 router.get('/:classId', protect, getClassById); 
@@ -39,5 +40,7 @@ router.get('/user/classes', protect, getUserClasses);  // Get the classes a user
 
 // GET: Get all students in a class (authentication required)
 router.get('/:classId/students', protect, getClassStudents);  // Get the students in a specific class
+
+
 
 export default router;

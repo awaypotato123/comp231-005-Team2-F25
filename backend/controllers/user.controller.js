@@ -142,3 +142,40 @@ export const getPublicUser = async (req, res) => {
     return res.status(500).json({ message: "Server error fetching public user" });
   }
 };
+
+export const updateUserCreds = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { credits } = req.body;
+
+    // Validate input
+    if (credits === undefined || isNaN(credits)) {
+      return res.status(400).json({ message: "Invalid or missing credit value" });
+    }
+
+    if (credits < 0) {
+      return res.status(400).json({ message: "Credits cannot be negative" });
+    }
+
+    // Update ONLY credits
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { credits },
+      { new: true }
+    ).select("credits");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Credits updated successfully",
+      credits: updatedUser.credits
+    });
+
+  } catch (error) {
+    console.error("Update credits error:", error);
+    res.status(500).json({ message: "Server error updating credits" });
+  }
+};
+
