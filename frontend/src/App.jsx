@@ -15,7 +15,10 @@ import EnterClass from './components/EnterClass';
 import ManageClass from './components/ManageClass';
 import PublicProfile from './components/ViewProfile';
 import BrowseUnified from './pages/BrowseUnified';
+<<<<<<< HEAD
 import Feedback from './components/Feedback';
+=======
+>>>>>>> 488f4ac56bb5bc7377687833c925d6923cf0ed95
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
