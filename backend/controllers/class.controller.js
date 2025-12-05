@@ -1,53 +1,61 @@
-import express from 'express';  // Make sure express is imported
+import express from 'express';
 import Class from '../models/classModel.js';  
 import Skill from '../models/Skill.js';  
 import User from '../models/User.js';  
 
-const router = express.Router();  // Define the router here
+const router = express.Router();
 
 // ------------------------------ CREATE CLASS ------------------------------
 export const createClass = async (req, res) => {
     try {
-        const { title, description, skillTitle, date, maxStudents } = req.body;
-        const userId = req.user.id;  // Get the user ID from the JWT (populated by the protect middleware)
+        const { title, description, skillId, date, maxStudents } = req.body;  // Changed skillTitle to skillId
+        const userId = req.user.id;
+
+        // Validate required fields
+        if (!title || !skillId || !date || !maxStudents) {
+            return res.status(400).json({ 
+                message: "Missing required fields: title, skillId, date, and maxStudents are required" 
+            });
+        }
 
         // Find the user by userId to get their firstName and lastName
-        const user = await User.findById(userId);  // Find user by ID in the User collection
+        const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ message: "User not found" });  // Handle case where user doesn't exist
+            return res.status(404).json({ message: "User not found" });
         }
 
         // Create the user's full name
         const userFullName = `${user.firstName} ${user.lastName}`;
 
-        // Find the skill by title and userId
-        const skill = await Skill.findOne({ title: skillTitle, userId });
-        if (!skill) return res.status(400).json({ message: "Skill not found" });
+        // Find the skill by ID and verify it belongs to the user
+        const skill = await Skill.findOne({ _id: skillId, userId });  // Changed to find by _id
+        if (!skill) {
+            return res.status(400).json({ message: "Skill not found or does not belong to you" });
+        }
 
         // Create a new class with the retrieved information
         const newClass = new Class({
             title,
-            description: description || skill.description,  // Default to skill description if not provided
+            description: description || skill.description,
             skill: skill._id,
-            user: userId,  // Store userId in class
-            userName: userFullName,  // Store the full name of the user
+            user: userId,
+            userName: userFullName,
             date,
-            maxStudents
+            maxStudents: parseInt(maxStudents)  // Ensure it's a number
         });
 
         // Save the new class to the database
         await newClass.save();
         res.status(201).json({ message: 'Class created successfully', class: newClass });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        console.error("Error creating class:", error);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 // ------------------------------ GET ALL CLASSES ------------------------------
 export const getClasses = async (req, res) => {
     try {
-        // Fetch all classes, no need for filtering by userId
         const classes = await Class.find().populate('skill', 'title');
 
         if (!classes.length) {
@@ -63,10 +71,9 @@ export const getClasses = async (req, res) => {
 // ------------------------------ GET SINGLE CLASS ------------------------------
 export const getClassById = async (req, res) => {
     try {
-        const { classId } = req.params;  // Get class ID from route parameters
-        const userId = req.user.id;  // Get user ID from req.user (set by protect middleware)
+        const { classId } = req.params;
+        const userId = req.user.id;
 
-        // Find the class by ID and user
         const classData = await Class.findOne({ _id: classId, user: userId }).populate('skill', 'title');
         if (!classData) return res.status(404).json({ message: "Class not found" });
         
@@ -80,35 +87,32 @@ export const getClassById = async (req, res) => {
 // ------------------------------ UPDATE CLASS ------------------------------
 export const updateClass = async (req, res) => {
     try {
-        const { classId } = req.params;  // Get class ID from route parameters
-        const { title, description, skillTitle, date, maxStudents } = req.body;
-        const userId = req.user.id;  // Get user ID from req.user (set by protect middleware)
+        const { classId } = req.params;
+        const { title, description, skillId, date, maxStudents } = req.body;  // Changed skillTitle to skillId
+        const userId = req.user.id;
 
-        // Find the skill by title and userId to make sure it belongs to the current user
-        const skill = await Skill.findOne({ title: skillTitle, userId });
+        // Find the skill by ID and userId to make sure it belongs to the current user
+        const skill = await Skill.findOne({ _id: skillId, userId });  // Changed to find by _id
         if (!skill) {
             return res.status(400).json({ message: "Skill not found or does not belong to you" });
         }
 
-        // Update the class with the new data
         const updatedClass = await Class.findOneAndUpdate(
-            { _id: classId, user: userId },  // Ensure the class belongs to the current user
+            { _id: classId, user: userId },
             {
                 title,
-                description: description || skill.description,  // Default to the skill's description if not provided
-                skill: skill._id,  // Update with the skill ID
+                description: description || skill.description,
+                skill: skill._id,
                 date,
                 maxStudents
             },
-            { new: true }  // Return the updated class
+            { new: true }
         );
 
-        // If the class is not found or the user doesn't own it, return an error
         if (!updatedClass) {
             return res.status(404).json({ message: "Class not found or you don't have permission to update it" });
         }
 
-        // Return the updated class
         res.status(200).json({ message: 'Class updated successfully', class: updatedClass });
     } catch (error) {
         console.error(error);
@@ -119,10 +123,9 @@ export const updateClass = async (req, res) => {
 // ------------------------------ DELETE CLASS ------------------------------
 export const deleteClass = async (req, res) => {
     try {
-        const { classId } = req.params;  // Get class ID from route parameters
-        const userId = req.user.id;  // Get user ID from req.user (set by protect middleware)
+        const { classId } = req.params;
+        const userId = req.user.id;
 
-        // Find and delete the class by ID and user
         const deletedClass = await Class.findOneAndDelete({ _id: classId, user: userId });
         if (!deletedClass) return res.status(404).json({ message: "Class not found" });
 
@@ -137,23 +140,19 @@ export const deleteClass = async (req, res) => {
 export const joinClass = async (req, res) => {
     try {
         const { classId } = req.params;
-        const userId = req.user.id; // Get the user ID from JWT
+        const userId = req.user.id;
 
-        // Find the class by ID
         const classData = await Class.findById(classId);
         if (!classData) return res.status(404).json({ message: "Class not found" });
 
-        // Check if the user is already in the class
         if (classData.students.includes(userId)) {
             return res.status(400).json({ message: "You have already joined this class" });
         }
 
-        // Check if class is full
         if (classData.students.length >= classData.maxStudents) {
             return res.status(400).json({ message: "Class is full" });
         }
 
-        // Add user to the class
         classData.students.push(userId);
         await classData.save();
 
@@ -167,9 +166,8 @@ export const joinClass = async (req, res) => {
 // ------------------------------ GET CLASSES USER IS ENROLLED IN ------------------------------
 export const getUserClasses = async (req, res) => {
     try {
-        const userId = req.user.id; // Get the user ID from JWT
+        const userId = req.user.id;
 
-        // Find all classes where the user is enrolled
         const userClasses = await Class.find({ students: userId });
 
         if (!userClasses.length) {
@@ -186,12 +184,11 @@ export const getUserClasses = async (req, res) => {
 // ------------------------------ GET USER-CREATED CLASSES ------------------------------
 export const getMyCreatedClasses = async (req, res) => {
     try {
-        const userId = req.user.id; // Logged-in user ID
+        const userId = req.user.id;
 
-        // Find classes created by this user
         const classes = await Class.find({ user: userId })
-            .populate('skill', 'title')   // optional
-            .populate('students', 'firstName lastName email'); // optional
+            .populate('skill', 'title')
+            .populate('students', 'firstName lastName email');
 
         if (!classes.length) {
             return res.status(404).json({ message: "You haven't created any classes yet" });
@@ -204,20 +201,18 @@ export const getMyCreatedClasses = async (req, res) => {
     }
 };
 
-
 // ------------------------------ GET STUDENTS IN A CLASS ------------------------------
 export const getClassStudents = async (req, res) => {
     try {
         const { classId } = req.params;
 
-        // Find the class and populate the students field
         const classData = await Class.findById(classId).populate('students', 'firstName lastName email');
 
         if (!classData) {
             return res.status(404).json({ message: "Class not found" });
         }
 
-        res.status(200).json(classData.students); // Return the list of students
+        res.status(200).json(classData.students);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Server error" });
@@ -230,23 +225,20 @@ export const getClassForStudent = async (req, res) => {
         const { classId } = req.params;
         const studentId = req.user.id;
 
-        // 1. Find the class by ID and populate the instructor (user)
         const classData = await Class.findById(classId)
             .populate('user', 'name')
-            .select('title date description students user'); // Use 'students' here
+            .select('title date description students user');
 
         if (!classData) {
             return res.status(404).json({ message: "Class not found." });
         }
 
-        // 2. Security Check: Verify the user is explicitly enrolled
         const isEnrolled = classData.students.includes(studentId); 
 
         if (!isEnrolled) {
             return res.status(403).json({ message: "You are not authorized to view this class." });
         }
 
-        // 3. Return a clean object for the student view
         return res.status(200).json({
             id: classData._id,
             title: classData.title,
