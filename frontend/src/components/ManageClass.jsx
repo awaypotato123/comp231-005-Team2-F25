@@ -89,63 +89,75 @@ export default function ManageClass() {
                         </button>
                     </div>
 
-                  {/* Student List */}
-{/* Student List */}
-<div className="bg-white shadow rounded-xl p-8">
-    <h2 className="text-xl font-bold text-gray-900 mb-4">Students Enrolled</h2>
+                    {/* Student List */}
+                    <div className="bg-white shadow rounded-xl p-8">
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">Students Enrolled</h2>
 
-    {classData.students?.length === 0 ? (
-        <p className="text-gray-500">No students enrolled yet.</p>
-    ) : (
-        <div className="overflow-x-auto">
-            <table className="min-w-full border border-gray-200 rounded-lg overflow-hidden">
-                <thead className="bg-gray-100 border-b">
-                    <tr>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-700 border-r">#</th>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-700">Student ID</th>
-                    </tr>
-                </thead>
+                        {classData.students?.length === 0 ? (
+                            <p className="text-gray-500">No students enrolled yet.</p>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full border border-gray-200 rounded-lg overflow-hidden">
+                                    <thead className="bg-gray-100 border-b">
+                                        <tr>
+                                            <th className="text-left px-4 py-3 font-semibold text-gray-700 border-r">#</th>
+                                            <th className="text-left px-4 py-3 font-semibold text-gray-700 border-r">Name</th>
+                                            <th className="text-left px-4 py-3 font-semibold text-gray-700">Email</th>
+                                        </tr>
+                                    </thead>
 
-                <tbody>
-                    {classData.students.map((student, index) => (
-                        <tr
-                            key={index}
-                            className={`${
-                                index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                            } border-b hover:bg-blue-50 transition`}
-                        >
-                            <td className="px-4 py-3 font-medium text-gray-700 border-r">
-                                {index + 1}
-                            </td>
+                                    <tbody>
+                                        {classData.students.map((student, index) => {
+                                            // Handle both populated and non-populated students
+                                            const isPopulated = typeof student === 'object' && student !== null;
+                                            const studentName = isPopulated 
+                                                ? `${student.firstName} ${student.lastName}` 
+                                                : 'Unknown';
+                                            const studentEmail = isPopulated 
+                                                ? student.email 
+                                                : student; // Show ID if not populated
 
-                            <td className="px-4 py-3 text-gray-800">
-                                {student}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    )}
-</div>
+                                            return (
+                                                <tr
+                                                    key={isPopulated ? student._id : student}
+                                                    className={`${
+                                                        index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                                                    } border-b hover:bg-blue-50 transition`}
+                                                >
+                                                    <td className="px-4 py-3 font-medium text-gray-700 border-r">
+                                                        {index + 1}
+                                                    </td>
 
+                                                    <td className="px-4 py-3 text-gray-800 border-r">
+                                                        {studentName}
+                                                    </td>
 
+                                                    <td className="px-4 py-3 text-gray-600">
+                                                        {studentEmail}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
 
                 </div>
 
                 {/* RIGHT SIDE - EMPTY FUNCTIONALITY BOX */}
                 <div className="space-y-8">
                     <div className="space-y-8">
-<InstructorPanel 
-  classId={classId}
-  userId={classData.user}
-/>
-</div>
+                        <InstructorPanel 
+                            classId={classId}
+                            userId={classData.user}
+                        />
+                    </div>
                     <div className="bg-white shadow-lg rounded-xl p-8 min-h-[400px]">
                         <h2 className="text-2xl font-bold text-gray-900 mb-4">
                             Class Tools
                         </h2>
-
 
                         <div className="mt-6 h-64 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center">
                             <p className="text-gray-400">Coming Soon</p>

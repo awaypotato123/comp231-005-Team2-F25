@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import StudentPanel from "./StudentPanel";
+import ClassReviews from "./ClassReviews";
 import api from "../lib/api";
 
 export default function EnterClass() {
     const { classId } = useParams();
+    const navigate = useNavigate();
     const [classData, setClassData] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -22,6 +24,10 @@ export default function EnterClass() {
     useEffect(() => {
         fetchClass();
     }, [classId]);
+
+    const handleGiveFeedback = () => {
+        navigate(`/feedback/${classId}`);
+    };
 
     if (loading) {
         return (
@@ -83,6 +89,17 @@ export default function EnterClass() {
                             </div>
 
                         </div>
+
+                        {/* Give Feedback Button */}
+                        <div className="mt-6">
+                            <button
+                                onClick={handleGiveFeedback}
+                                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg transition shadow-md flex items-center justify-center gap-2"
+                            >
+                                <span className="text-xl">📝</span>
+                                Give Feedback
+                            </button>
+                        </div>
                     </div>
 
                     {/* Description */}
@@ -101,13 +118,16 @@ export default function EnterClass() {
                         </p>
                     </div>
 
+                    {/* Class Reviews - NEW! */}
+                    <ClassReviews classId={classId} />
+
                 </div>
 
                 {/* RIGHT SIDE */}
                 <div className="space-y-8">
                     <div className="space-y-8">
-  <StudentPanel classId={classId} />
-</div>
+                        <StudentPanel classId={classId} />
+                    </div>
                     <div className="bg-white shadow-lg rounded-xl p-8 min-h-[400px]">
                         <h2 className="text-2xl font-bold text-gray-900 mb-4">
                             Student Tools

@@ -16,6 +16,7 @@ import ManageClass from './components/ManageClass';
 import PublicProfile from './components/ViewProfile';
 import BrowseUnified from './pages/BrowseUnified';
 import Feedback from './components/Feedback';
+import InstructorFeedback from './components/InstructorFeedback';
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="/manage-class/:classId" element={<ManageClass />} />
             <Route path="/profile/:userId" element={<PublicProfile />} />
             <Route path="/feedback/:classId" element={<Feedback />} />
+            <Route path="/instructor-feedback" element={<InstructorFeedback />} />
           </Routes>
         </div>
       </ToastProvider>

@@ -74,12 +74,29 @@ export const getClassById = async (req, res) => {
         const { classId } = req.params;
         const userId = req.user.id;
 
-        const classData = await Class.findOne({ _id: classId, user: userId }).populate('skill', 'title');
-        if (!classData) return res.status(404).json({ message: "Class not found" });
+        // Find the class by ID
+        const classData = await Class.findById(classId)
+            .populate('skill', 'title category level')
+            .populate('students', 'firstName lastName email');
         
+        if (!classData) {
+            return res.status(404).json({ message: "Class not found" });
+        }
+
+        // Check if user is the instructor OR is enrolled as a student
+        const isInstructor = classData.user.toString() === userId;
+        const isEnrolled = classData.students.some(student => student._id.toString() === userId);
+
+        if (!isInstructor && !isEnrolled) {
+            return res.status(403).json({ 
+                message: "You are not authorized to view this class. Please request to join first." 
+            });
+        }
+
+        // Return full class data
         res.status(200).json(classData);
     } catch (error) {
-        console.error(error);
+        console.error("Get class by ID error:", error);
         res.status(500).json({ message: 'Server error' });
     }
 };
@@ -233,7 +250,7 @@ export const getClassForStudent = async (req, res) => {
             return res.status(404).json({ message: "Class not found." });
         }
 
-        const isEnrolled = classData.students.includes(studentId); 
+        const isEnrolled = classData.students.some(student => student.toString() === studentId); 
 
         if (!isEnrolled) {
             return res.status(403).json({ message: "You are not authorized to view this class." });

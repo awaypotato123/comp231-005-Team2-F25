@@ -8,7 +8,7 @@ const router = express.Router();
 export const submitFeedback = async (req, res) => {
     try {
         const { classId, rating, comments } = req.body;
-        const studentId = req.user.id; // The ID of the authenticated student
+        const studentId = req.user.id;
 
         // --- 1. Basic Input Validation ---
         if (!classId || !rating || !comments) {
@@ -21,30 +21,24 @@ export const submitFeedback = async (req, res) => {
         }
 
         // --- 2. Class, Enrollment, and Instructor ID Retrieval ---
-        
-        // Find the class and select the 'students', 'date', and 'user' (instructor) fields
         const classData = await Class.findById(classId).select('students date user'); 
 
         if (!classData) {
             return res.status(404).json({ message: "Class not found." });
         }
         
-        // --- NEW: Retrieve the Instructor ID ---
         const instructorId = classData.user; 
         if (!instructorId) {
              return res.status(500).json({ message: "Class data is incomplete: Missing instructor ID." });
         }
 
-        // Check if the student is enrolled (using the 'students' array)
+        // Check if the student is enrolled
         const isEnrolled = classData.students.includes(studentId);
         if (!isEnrolled) {
             return res.status(403).json({ message: "You are not enrolled in this class and cannot submit feedback." });
         }
 
-        // Check if the class is actually completed
-        if (new Date(classData.date) > new Date()) {
-            return res.status(400).json({ message: "Cannot submit feedback for an ongoing or future class." });
-        }
+        // REMOVED: Date check - students can give feedback anytime
 
         // --- 3. Prevent Duplicate Submissions ---
         const existingFeedback = await Feedback.findOne({ classId, studentId });
@@ -79,30 +73,26 @@ export const getFeedbackForClass = async (req, res) => {
         const { classId } = req.params;
         const feedbacks = await Feedback
             .find({ classId })
-            .populate('studentId', 'name email') // Populate student details
-            .populate('instructorId', 'name email'); // Populate instructor details
-        res.status(200).json({ feedbacks });
+            .populate('studentId', 'firstName lastName email') // FIXED: studentId instead of userId
+            .populate('instructorId', 'firstName lastName email');
+        
+        res.status(200).json(feedbacks); // Return array directly
     } catch (error) {
         console.error("Error fetching feedback:", error);
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-/**
- * @desc Get all feedback documents for the authenticated instructor
- * @route GET /api/feedbacks/instructor
- * @access Private (Instructor)
- */
 export const getFeedbackForInstructor = async (req, res) => {
     try {
         const instructorId = req.user.id;
 
         const feedbacks = await Feedback.find({ instructorId })
-            .populate('studentId', 'name') // Only show student name
-            .populate('classId', 'title') // Only show class title
-            .sort({ createdAt: -1 }); // Show newest first
+            .populate('studentId', 'firstName lastName email') // FIXED: studentId instead of userId
+            .populate('classId', 'title')
+            .sort({ createdAt: -1 });
 
-        res.status(200).json({ feedbacks });
+        res.status(200).json(feedbacks); // Return array directly
 
     } catch (error) {
         console.error("Error fetching instructor feedback:", error);

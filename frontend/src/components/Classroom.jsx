@@ -145,10 +145,18 @@ export default function Classroom() {
         </div>
 
         <div
-          className="cursor-pointer p-4 mt-4 rounded-lg hover:bg-red-950 text-white transition"
+          className="cursor-pointer p-4 mb-4 rounded-lg hover:bg-red-950 text-white transition"
           onClick={goToPublicProfile}
         >
           My Public Profile
+        </div>
+
+        {/* NEW: My Feedback Link */}
+        <div
+          className="cursor-pointer p-4 mb-4 rounded-lg hover:bg-green-700 text-white transition bg-gray-700"
+          onClick={() => navigate("/instructor-feedback")}
+        >
+          📊 My Feedback
         </div>
       </div>
 
