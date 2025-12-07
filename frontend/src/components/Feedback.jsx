@@ -8,19 +8,16 @@ export default function Feedback() {
   const navigate = useNavigate();
   const { push } = useToasts();
   
-  // State for fetched data and form inputs
   const [classTitle, setClassTitle] = useState('Loading...');
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false); 
   const [rating, setRating] = useState('');
   const [comments, setComments] = useState('');
 
-  // 1. Fetch Class Title using GET /api/classes/student/:classId
   useEffect(() => {
     const fetchClassDetails = async () => {
       try {
         setLoading(true);
-        // This corresponds to: router.get('/classes/student/:classId', protect, getClassForStudent);
         const response = await api.get(`/classes/student/${classId}`); 
         setClassTitle(response.data.title || 'Unknown Class');
 
@@ -36,7 +33,6 @@ export default function Feedback() {
     fetchClassDetails();
   }, [classId, push]);
 
-  // 2. Submit Feedback using POST /api/feedback
   const handleSubmitFeedback = async (e) => {
     e.preventDefault();
 
@@ -44,8 +40,7 @@ export default function Feedback() {
         push("Please provide both a rating and comments.", "error");
         return;
     }
-    
-    // Validate rating is within range before submission
+
     const numericRating = parseInt(rating);
     if (isNaN(numericRating) || numericRating < 1 || numericRating > 5) {
         push("Rating must be a number between 1 and 5.", "error");
@@ -54,24 +49,23 @@ export default function Feedback() {
 
 
     try {
-        setIsSubmitting(true); // Set submitting state
+        setIsSubmitting(true);
         const feedbackData = {
             classId,
-            rating: numericRating, // Use the parsed number
+            rating: numericRating,
             comments,
         };
         
-        // Backend route: POST /api/feedbacks
         await api.post(`/feedbacks`, feedbackData);
         
         push(`Feedback successfully submitted for: ${classTitle}`, "success");
-        navigate('/classroom'); // Navigate back after successful submission
+        navigate('/classroom');
 
     } catch (error) {
         console.error("Error submitting feedback:", error);
         push(error.response?.data?.message || "Failed to submit feedback.", "error");
     } finally {
-        setIsSubmitting(false); // Clear submitting state
+        setIsSubmitting(false);
     }
   };
 
@@ -125,7 +119,7 @@ export default function Feedback() {
         <button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-150"
-          disabled={loading || isSubmitting} // Disable if loading class info or submitting
+          disabled={loading || isSubmitting}
         >
           {loading ? 'Loading...' : isSubmitting ? 'Submitting...' : 'Submit Feedback'}
         </button>

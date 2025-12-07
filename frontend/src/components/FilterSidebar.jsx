@@ -42,7 +42,6 @@ export default function FilterSidebar({ filters, onFilterChange, onClearFilters 
         </button>
       </div>
 
-      {/* Categories Filter */}
       <div className="mb-6">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">Categories</h3>
         <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -63,7 +62,6 @@ export default function FilterSidebar({ filters, onFilterChange, onClearFilters 
         </div>
       </div>
 
-      {/* Skill Level Filter */}
       <div>
         <h3 className="text-sm font-semibold text-gray-900 mb-3">Skill Level</h3>
         <div className="space-y-2">
@@ -84,7 +82,6 @@ export default function FilterSidebar({ filters, onFilterChange, onClearFilters 
         </div>
       </div>
 
-      {/* Active Filters Display */}
       {(filters.categories.length > 0 || filters.levels.length > 0) && (
         <div className="mt-6 pt-6 border-t border-gray-200">
           <h3 className="text-sm font-semibold text-gray-900 mb-2">Active Filters</h3>

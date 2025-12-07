@@ -11,7 +11,7 @@ export default function EditClass() {
   const [classData, setClassData] = useState({
     title: "",
     description: "",
-    skillId: "", // Changed from skillTitle to skillId
+    skillId: "",
     date: "",
     maxStudents: 0,
   });
@@ -27,14 +27,13 @@ export default function EditClass() {
     fetchData();
   }, []);
 
-  // Fetch the class data by classId
   const fetchClassData = async () => {
     try {
       const response = await api.get(`/classes/${classId}`);
       setClassData({
         title: response.data.title,
         description: response.data.description,
-        skillId: response.data.skill._id, // Store skill ID, not title
+        skillId: response.data.skill._id,
         date: response.data.date,
         maxStudents: response.data.maxStudents,
       });
@@ -44,7 +43,6 @@ export default function EditClass() {
     }
   };
 
-  // Fetch the current user's profile, including skills
   const fetchUserProfile = async () => {
     try {
       const response = await api.get("/users/me");
@@ -55,17 +53,14 @@ export default function EditClass() {
     }
   };
 
-  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setClassData({ ...classData, [name]: value });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate
     if (!classData.title.trim()) {
       push("Please enter a class title", "error");
       return;
@@ -89,12 +84,12 @@ export default function EditClass() {
     const updatedClassData = {
       title: classData.title,
       description: classData.description,
-      skillId: classData.skillId, // Send skillId, not skillTitle
-      date: new Date(classData.date).toISOString(), // Convert to ISO string
+      skillId: classData.skillId,
+      date: new Date(classData.date).toISOString(),
       maxStudents: parseInt(classData.maxStudents),
     };
 
-    console.log("Sending update:", updatedClassData); // Debug log
+    console.log("Sending update:", updatedClassData);
 
     try {
       await api.put(`/classes/${classId}`, updatedClassData);
@@ -112,7 +107,6 @@ export default function EditClass() {
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Edit Class</h2>
 
       <form onSubmit={handleSubmit}>
-        {/* Class Title */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Class Title *
@@ -128,7 +122,6 @@ export default function EditClass() {
           />
         </div>
 
-        {/* Class Description */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Description *
@@ -144,7 +137,6 @@ export default function EditClass() {
           />
         </div>
 
-        {/* Max Students */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Max Students *
@@ -162,7 +154,6 @@ export default function EditClass() {
           />
         </div>
 
-        {/* Select Skill */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select Skill *
@@ -191,7 +182,6 @@ export default function EditClass() {
           )}
         </div>
 
-        {/* Class Date */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Class Date *
@@ -210,7 +200,6 @@ export default function EditClass() {
           </p>
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition"

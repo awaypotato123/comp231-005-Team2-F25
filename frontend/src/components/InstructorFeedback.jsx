@@ -70,15 +70,12 @@ export default function InstructorFeedback() {
     <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">My Class Feedback</h1>
 
-      {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Total Feedback */}
         <div className="bg-white rounded-lg shadow p-6">
           <p className="text-gray-600 text-sm mb-2">Total Reviews</p>
           <p className="text-4xl font-bold text-blue-600">{stats.total}</p>
         </div>
 
-        {/* Average Rating */}
         <div className="bg-white rounded-lg shadow p-6">
           <p className="text-gray-600 text-sm mb-2">Average Rating</p>
           <div className="flex items-center gap-2">
@@ -87,7 +84,6 @@ export default function InstructorFeedback() {
           </div>
         </div>
 
-        {/* Rating Breakdown */}
         <div className="bg-white rounded-lg shadow p-6">
           <p className="text-gray-600 text-sm mb-3">Rating Distribution</p>
           {[5, 4, 3, 2, 1].map((rating) => (
@@ -111,7 +107,6 @@ export default function InstructorFeedback() {
         </div>
       </div>
 
-      {/* Feedback List */}
       <div className="bg-white rounded-lg shadow">
         <div className="px-6 py-4 border-b">
           <h2 className="text-xl font-bold text-gray-900">All Reviews</h2>

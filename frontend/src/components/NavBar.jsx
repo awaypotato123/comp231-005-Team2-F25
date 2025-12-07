@@ -21,7 +21,6 @@ export default function Navbar() {
       <nav className="bg-white shadow-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-md flex items-center justify-center text-white font-bold">
                 S
@@ -29,7 +28,6 @@ export default function Navbar() {
               <span className="font-bold text-xl text-gray-900">SkillSwap</span>
             </Link>
 
-            {/* Mobile menu toggle */}
             <button
               className="sm:hidden p-2 text-gray-700"
               onClick={() => setOpen(!open)}
@@ -56,8 +54,7 @@ export default function Navbar() {
                   <Link to="/dashboard" className="text-gray-700 hover:text-blue-600">
                     Dashboard
                   </Link>
-                  
-                  {/* Show Admin link only for admin users */}
+
                   {user.role === "admin" && (
                     <Link to="/admin" className="text-gray-700 hover:text-blue-600 font-semibold">
                       Admin
@@ -109,7 +106,6 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Success Pop-up Message for Sign In */}
       {isSignInSuccessPopup && (
         <div className="fixed top-5 right-5 z-50 bg-blue-100 border border-blue-400 rounded-lg text-blue-700 p-4 shadow-md transition-transform transform duration-300 ease-in-out">
           <div className="flex items-center">

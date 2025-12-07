@@ -10,7 +10,7 @@ export default function BookingRequests() {
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showResponseModal, setShowResponseModal] = useState(false);
-  const [responseType, setResponseType] = useState(""); // "accept" or "reject"
+  const [responseType, setResponseType] = useState("");
   const [responseData, setResponseData] = useState({
     teacherResponse: "",
     meetingLink: ""
@@ -87,7 +87,6 @@ export default function BookingRequests() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Booking Requests</h1>
           <p className="text-gray-600 mt-2">
@@ -95,7 +94,6 @@ export default function BookingRequests() {
           </p>
         </div>
 
-        {/* Bookings List */}
         {bookings.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-12 text-center">
             <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,7 +124,6 @@ export default function BookingRequests() {
                   {getStatusBadge(booking.status)}
                 </div>
 
-                {/* Booking Details */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   {booking.preferredDate && (
                     <div>
@@ -148,7 +145,6 @@ export default function BookingRequests() {
                   </div>
                 </div>
 
-                {/* Student's Message */}
                 {booking.message && (
                   <div className="mb-4 p-3 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-500 mb-1">Student's Message:</p>
@@ -156,7 +152,6 @@ export default function BookingRequests() {
                   </div>
                 )}
 
-                {/* Your Response (if given) */}
                 {booking.teacherResponse && (
                   <div className="mb-4 p-3 bg-blue-50 rounded-lg">
                     <p className="text-sm text-blue-600 mb-1 font-medium">
@@ -166,7 +161,6 @@ export default function BookingRequests() {
                   </div>
                 )}
 
-                {/* Meeting Link (if accepted) */}
                 {booking.meetingLink && (
                   <div className="mb-4 p-3 bg-green-50 rounded-lg">
                     <p className="text-sm text-green-600 mb-2 font-medium">
@@ -183,7 +177,6 @@ export default function BookingRequests() {
                   </div>
                 )}
 
-                {/* Actions */}
                 <div className="flex gap-3 pt-4 border-t">
                   {booking.status === "pending" && (
                     <>
@@ -212,7 +205,6 @@ export default function BookingRequests() {
         )}
       </div>
 
-      {/* Response Modal */}
       {showResponseModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
@@ -231,7 +223,6 @@ export default function BookingRequests() {
             </div>
 
             <div className="p-6">
-              {/* Response Message */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Your Message
@@ -251,7 +242,6 @@ export default function BookingRequests() {
                 />
               </div>
 
-              {/* Meeting Link (only for accept) */}
               {responseType === "accept" && (
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -269,7 +259,6 @@ export default function BookingRequests() {
                 </div>
               )}
 
-              {/* Buttons */}
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowResponseModal(false)}

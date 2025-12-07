@@ -92,7 +92,6 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Auth Modal for Sign Up */}
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
@@ -101,7 +100,6 @@ export default function Home() {
         setIsSignInSuccessPopup={setIsSignInSuccessPopup}
       />
 
-      {/* Success Pop-up Message for Sign Up */}
       {isSignUpSuccessPopup && (
         <div className="fixed top-5 right-5 z-50 bg-green-100 border border-green-400 rounded-lg text-green-700 p-4 shadow-md transition-transform transform duration-300 ease-in-out">
           <div className="flex items-center">

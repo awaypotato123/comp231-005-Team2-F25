@@ -108,7 +108,6 @@ export default function ClassReviews({ classId }) {
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  {/* Avatar */}
                   <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
                     <span className="text-blue-600 font-semibold text-lg">
                       {feedback.studentId?.firstName?.[0] || '?'}

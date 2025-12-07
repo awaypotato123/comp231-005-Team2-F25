@@ -3,7 +3,6 @@ import api from "../lib/api";
 import { useToasts } from "../context/ToastContext";
 import { useNavigate } from "react-router-dom";
 
-// Helper function to check if a class is completed
 const isClassCompleted = (classDate) => {
   const today = new Date();
   const classDateTime = new Date(classDate);
@@ -26,7 +25,6 @@ export default function Classroom() {
     setActivePortal(portal);
   };
 
-  // Fetch current user info
   const fetchCurrentUser = async () => {
     try {
       const response = await api.get("/users/me");
@@ -36,7 +34,6 @@ export default function Classroom() {
     }
   };
 
-  // Fetch user classes (student)
   const fetchUserClasses = async () => {
     setLoading(true);
     try {
@@ -55,7 +52,6 @@ export default function Classroom() {
     }
   };
 
-  // Fetch instructor classes
   const fetchInstructorClasses = async () => {
     setLoading(true);
     try {
@@ -74,7 +70,6 @@ export default function Classroom() {
     }
   };
 
-  // Removed skill based pending requests because skill is undefined.
   const fetchPendingRequests = async () => {
     try {
       const response = await api.get("/requests/skills/");
@@ -85,13 +80,11 @@ export default function Classroom() {
     }
   };
 
-  // Feedback handler
   const handleFeedback = (classId, classTitle) => {
     push(`Ready to give feedback for: ${classTitle}`, "info");
     navigate(`/feedback/${classId}`);
   };
 
-  // Delete class
   const handleDeleteClass = async (classId) => {
     if (!window.confirm("Are you sure you want to delete this class")) return;
 
@@ -104,7 +97,6 @@ export default function Classroom() {
     }
   };
 
-  // Navigate to profile
   const goToPublicProfile = () => {
     if (!currentUser) return;
     navigate(`/profile/${currentUser._id}`);
@@ -124,7 +116,6 @@ export default function Classroom() {
   return (
     <div className="flex h-screen">
 
-      {/* Sidebar */}
       <div className="w-64 bg-gray-800 text-white p-6 fixed h-full overflow-y-auto">
         <div
           className={`cursor-pointer p-4 mb-4 rounded-lg hover:bg-slate-50 hover:text-blue-700 transition ${
@@ -151,7 +142,6 @@ export default function Classroom() {
           My Public Profile
         </div>
 
-        {/* My Feedback Link */}
         <div
           className="cursor-pointer p-4 mb-4 rounded-lg hover:bg-green-700 text-white transition bg-gray-700"
           onClick={() => navigate("/instructor-feedback")}
@@ -159,7 +149,6 @@ export default function Classroom() {
           📊 My Feedback
         </div>
 
-        {/* NEW: My Bookings (Student) */}
         <div
           className="cursor-pointer p-4 mb-4 rounded-lg hover:bg-purple-700 text-white transition bg-gray-700"
           onClick={() => navigate("/my-bookings")}
@@ -167,7 +156,6 @@ export default function Classroom() {
           📋 My Bookings
         </div>
 
-        {/* NEW: Booking Requests (Instructor) */}
         <div
           className="cursor-pointer p-4 mb-4 rounded-lg hover:bg-orange-700 text-white transition bg-gray-700"
           onClick={() => navigate("/booking-requests")}
@@ -176,10 +164,8 @@ export default function Classroom() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="ml-64 w-full p-6">
 
-        {/* Student Portal */}
         {activePortal === "student" && (
           <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
             <h2 className="text-2xl font-semibold text-gray-800">Student Portal</h2>
@@ -194,12 +180,10 @@ export default function Classroom() {
               </button>
             </div>
 
-            {/* Loading spinner */}
             {loading && (
               <div className="text-center animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto my-4"></div>
             )}
 
-            {/* No Classes */}
             {(!userClasses || userClasses.length === 0) && !loading ? (
               <p className="text-gray-500 mt-4">You have not joined any classes yet.</p>
             ) : (
@@ -248,7 +232,6 @@ export default function Classroom() {
           </div>
         )}
 
-        {/* Instructor Portal */}
         {activePortal === "instructor" && (
           <div className="bg-gray-100 p-6 rounded-lg shadow-lg relative">
             <h2 className="text-2xl font-semibold text-gray-800">Instructor Portal</h2>
@@ -263,12 +246,10 @@ export default function Classroom() {
               </button>
             </div>
 
-            {/* Loading spinner */}
             {loading && (
               <div className="text-center animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto my-4"></div>
             )}
 
-            {/* No classes created */}
             {(!classes || classes.length === 0) && !loading ? (
               <p className="text-gray-500 mt-4">You have not created any classes yet.</p>
             ) : (

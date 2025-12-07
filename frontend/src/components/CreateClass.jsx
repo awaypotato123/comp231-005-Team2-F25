@@ -5,25 +5,23 @@ import { useNavigate } from "react-router-dom";
 
 export default function CreateClass() {
   const { push } = useToasts();
-  const [skill, setSkill] = useState(""); // Store skill ID, not title
+  const [skill, setSkill] = useState("");
   const [classTitle, setClassTitle] = useState("");
   const [classDescription, setClassDescription] = useState("");
   const [maxStudents, setMaxStudents] = useState(0);
-  const [classDate, setClassDate] = useState(""); // Empty initially
+  const [classDate, setClassDate] = useState("");
   const [userProfile, setUserProfile] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchUserProfile();
-    // Set default date to tomorrow at 10 AM
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(10, 0, 0, 0);
-    const formatted = tomorrow.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
+    const formatted = tomorrow.toISOString().slice(0, 16);
     setClassDate(formatted);
   }, []);
 
-  // Fetch the current user's profile including skills
   const fetchUserProfile = async () => {
     try {
       const response = await api.get("/users/me");
@@ -37,7 +35,6 @@ export default function CreateClass() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate required fields
     if (!classTitle.trim()) {
       push("Please enter a class title", "error");
       return;
@@ -66,12 +63,12 @@ export default function CreateClass() {
     const newClass = {
       title: classTitle,
       description: classDescription,
-      skillId: skill, // Send skill ID, not title
-      date: new Date(classDate).toISOString(), // Convert to ISO string
+      skillId: skill,
+      date: new Date(classDate).toISOString(),
       maxStudents: parseInt(maxStudents),
     };
 
-    console.log("Sending class data:", newClass); // Debug log
+    console.log("Sending class data:", newClass);
 
     try {
       await api.post("/classes", newClass);
@@ -79,7 +76,7 @@ export default function CreateClass() {
       navigate("/classroom");
     } catch (error) {
       console.error("Error creating class:", error);
-      console.error("Error response:", error.response?.data); // Show backend error
+      console.error("Error response:", error.response?.data);
       push(error.response?.data?.message || "Failed to create class", "error");
     }
   };
@@ -89,7 +86,6 @@ export default function CreateClass() {
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Create New Class</h2>
 
       <form onSubmit={handleSubmit}>
-        {/* Class Title */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Class Title *
@@ -104,7 +100,6 @@ export default function CreateClass() {
           />
         </div>
 
-        {/* Class Description */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Class Description *
@@ -119,7 +114,6 @@ export default function CreateClass() {
           />
         </div>
 
-        {/* Max Students */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Max Students *
@@ -136,7 +130,6 @@ export default function CreateClass() {
           />
         </div>
 
-        {/* Select Skill */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select Skill *
@@ -164,7 +157,6 @@ export default function CreateClass() {
           )}
         </div>
 
-        {/* Class Date */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Class Date *
@@ -173,7 +165,7 @@ export default function CreateClass() {
             type="datetime-local"
             value={classDate}
             onChange={(e) => setClassDate(e.target.value)}
-            min={new Date().toISOString().slice(0, 16)} // Can't select past dates
+            min={new Date().toISOString().slice(0, 16)}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
@@ -182,7 +174,6 @@ export default function CreateClass() {
           </p>
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition"

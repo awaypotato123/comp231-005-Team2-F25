@@ -4,7 +4,6 @@ import api from "../lib/api";
 export default function StudentPanel({ classId }) {
   const [posts, setPosts] = useState([]);
 
-  // Load posts from backend
   const loadPosts = async () => {
     try {
       const res = await api.get(`/classposts/${classId}`);
@@ -18,11 +17,10 @@ export default function StudentPanel({ classId }) {
     loadPosts();
   }, [classId]);
 
-  // Reacting to a post
   const react = async (id, type) => {
     try {
       await api.post(`/classposts/react/${id}`, { reaction: type });
-      loadPosts();  // refresh
+      loadPosts();
     } catch (err) {
       console.error("Failed to react:", err);
     }
@@ -73,7 +71,6 @@ export default function StudentPanel({ classId }) {
                 </div>
               )}
 
-              {/* Reaction buttons */}
               <div className="flex gap-4 mt-3 text-lg">
                 <button onClick={() => react(post._id, "like")} className="hover:scale-110 transition">
                   👍

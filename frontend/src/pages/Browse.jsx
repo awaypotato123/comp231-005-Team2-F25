@@ -38,7 +38,6 @@ export default function Browse() {
     }
   };
 
-  // Apply filters and search whenever they change
   useEffect(() => {
     applyFiltersAndSearch();
   }, [searchQuery, filters, skills]);
@@ -46,7 +45,6 @@ export default function Browse() {
   const applyFiltersAndSearch = () => {
     let filtered = [...skills];
 
-    // Apply search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -57,14 +55,12 @@ export default function Browse() {
       );
     }
 
-    // Apply category filter
     if (filters.categories.length > 0) {
       filtered = filtered.filter((skill) =>
         filters.categories.includes(skill.category)
       );
     }
 
-    // Apply level filter
     if (filters.levels.length > 0) {
       filtered = filtered.filter((skill) =>
         filters.levels.includes(skill.level)
@@ -78,7 +74,6 @@ export default function Browse() {
     const value = e.target.value;
     setSearchQuery(value);
     
-    // Update URL query params
     if (value) {
       setSearchParams({ q: value });
     } else {
@@ -98,15 +93,13 @@ export default function Browse() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Browse Skills</h1>
           <p className="text-blue-100 mb-8">
             Discover and learn new skills from talented instructors
           </p>
-          
-          {/* Search Bar */}
+
           <div className="max-w-2xl">
             <SearchBar
               value={searchQuery}
@@ -117,10 +110,8 @@ export default function Browse() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar - Filters */}
           <aside className="lg:w-64 flex-shrink-0">
             <FilterSidebar
               filters={filters}
@@ -129,9 +120,7 @@ export default function Browse() {
             />
           </aside>
 
-          {/* Skills Grid */}
           <main className="flex-1">
-            {/* Results Header */}
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
                 {searchQuery
@@ -143,7 +132,6 @@ export default function Browse() {
               </p>
             </div>
 
-            {/* Loading State */}
             {loading && (
               <div className="text-center py-12">
                 <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -151,7 +139,6 @@ export default function Browse() {
               </div>
             )}
 
-            {/* Error State */}
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
                 <p className="text-red-800">{error}</p>
@@ -164,7 +151,6 @@ export default function Browse() {
               </div>
             )}
 
-            {/* Empty State */}
             {!loading && !error && filteredSkills.length === 0 && (
               <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
                 <svg
@@ -193,7 +179,6 @@ export default function Browse() {
               </div>
             )}
 
-            {/* Skills Grid */}
             {!loading && !error && filteredSkills.length > 0 && (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                 {filteredSkills.map((skill) => (

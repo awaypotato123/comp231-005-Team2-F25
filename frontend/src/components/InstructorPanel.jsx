@@ -5,7 +5,6 @@ export default function InstructorPanel({ classId, userId }) {
   const [message, setMessage] = useState("");
   const [posts, setPosts] = useState([]);
 
-  // load posts from backend
   const loadPosts = async () => {
     try {
       const res = await api.get(`/classposts/${classId}`);
@@ -19,7 +18,6 @@ export default function InstructorPanel({ classId, userId }) {
     loadPosts();
   }, [classId]);
 
-  // send a post to backend
   const handleSend = async () => {
     if (!message.trim()) return;
 
@@ -36,7 +34,6 @@ export default function InstructorPanel({ classId, userId }) {
     }
   };
 
-  // delete a post in backend
   const handleDelete = async (id) => {
     try {
       await api.delete(`/classposts/delete/${id}`);
@@ -53,7 +50,6 @@ export default function InstructorPanel({ classId, userId }) {
         Instructor Board
       </h2>
 
-      {/* Posts List */}
       <div className="flex-1 overflow-y-auto space-y-4 pr-1">
         {posts.length === 0 && (
           <p className="text-gray-400 text-center">
@@ -73,7 +69,6 @@ export default function InstructorPanel({ classId, userId }) {
               key={post._id}
               className="relative border border-gray-200 rounded-lg p-4 bg-gray-50 shadow-sm"
             >
-              {/* delete button */}
               <button
                 onClick={() => handleDelete(post._id)}
                 className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-sm"
@@ -81,18 +76,15 @@ export default function InstructorPanel({ classId, userId }) {
                 ✕
               </button>
 
-              {/* message */}
               <p className="text-gray-900 text-sm leading-relaxed">
                 {post.message}
               </p>
 
-              {/* timestamp */}
               <p className="text-xs text-gray-500 mt-2">
                 {new Date(post.createdAt).toLocaleDateString()} at{" "}
                 {new Date(post.createdAt).toLocaleTimeString()}
               </p>
 
-              {/* reaction bar */}
               {hasReactions && (
                 <div className="flex gap-4 mt-3 text-lg opacity-60 pointer-events-none select-none">
                   {post.reactions.like > 0 && <span>👍 {post.reactions.like}</span>}
@@ -106,7 +98,6 @@ export default function InstructorPanel({ classId, userId }) {
         })}
       </div>
 
-      {/* Input area */}
       <div className="mt-4 border-t pt-4">
         <textarea
           className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"

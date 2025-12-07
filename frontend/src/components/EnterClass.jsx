@@ -49,10 +49,8 @@ export default function EnterClass() {
         <div className="min-h-screen bg-gray-100 py-10 px-6">
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
 
-                {/* LEFT SIDE */}
                 <div className="space-y-8">
 
-                    {/* Header and stats */}
                     <div className="bg-white shadow rounded-xl p-8">
                         <h1 className="text-3xl font-bold text-gray-900">
                            Class Name: {classData.title}
@@ -64,7 +62,6 @@ export default function EnterClass() {
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
 
-                            {/* Date */}
                             <div className="p-5 bg-blue-100 rounded-xl shadow-sm">
                                 <p className="text-sm text-gray-600">Date</p>
                                 <p className="text-2xl font-semibold text-blue-700 mt-1">
@@ -72,7 +69,6 @@ export default function EnterClass() {
                                 </p>
                             </div>
 
-                            {/* Capacity */}
                             <div className="p-5 bg-green-100 rounded-xl shadow-sm">
                                 <p className="text-sm text-gray-600">Student Limit</p>
                                 <p className="text-2xl font-semibold text-green-700 mt-1">
@@ -80,7 +76,6 @@ export default function EnterClass() {
                                 </p>
                             </div>
 
-                            {/* Joined */}
                             <div className="p-5 bg-yellow-100 rounded-xl shadow-sm">
                                 <p className="text-sm text-gray-600">Students Joined</p>
                                 <p className="text-2xl font-semibold text-yellow-700 mt-1">
@@ -90,7 +85,6 @@ export default function EnterClass() {
 
                         </div>
 
-                        {/* Give Feedback Button */}
                         <div className="mt-6">
                             <button
                                 onClick={handleGiveFeedback}
@@ -102,7 +96,6 @@ export default function EnterClass() {
                         </div>
                     </div>
 
-                    {/* Description */}
                     <div className="bg-white shadow rounded-xl p-8">
                         <h2 className="text-xl font-bold text-gray-900 mb-3">About This Class</h2>
                         <p className="text-gray-700 leading-relaxed">
@@ -110,7 +103,6 @@ export default function EnterClass() {
                         </p>
                     </div>
 
-                    {/* Skill */}
                     <div className="bg-white shadow rounded-xl p-8">
                         <h2 className="text-xl font-bold text-gray-900 mb-3">Skill Focus</h2>
                         <p className="text-gray-700">
@@ -118,12 +110,10 @@ export default function EnterClass() {
                         </p>
                     </div>
 
-                    {/* Class Reviews - NEW! */}
                     <ClassReviews classId={classId} />
 
                 </div>
 
-                {/* RIGHT SIDE */}
                 <div className="space-y-8">
                     <div className="space-y-8">
                         <StudentPanel classId={classId} />

@@ -11,7 +11,6 @@ const SkillForm = () => {
     const [skills, setSkills] = useState([]);
     const [instructors, setInstructors] = useState([]);
 
-    // Fetch skills and instructors from the backend
     useEffect(() => {
         async function fetchData() {
             try {
@@ -39,9 +38,7 @@ const SkillForm = () => {
                 maxStudents
             });
 
-            // Display success message
             alert(response.data.message);
-            // Optionally reset the form fields after successful submission
             setTitle('');
             setDescription('');
             setSkill('');

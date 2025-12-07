@@ -15,7 +15,6 @@ export default function Dashboard() {
   const [classes, setClasses] = useState([]);
   const navigate = useNavigate();
 
-  // Profile form state
   const [profileForm, setProfileForm] = useState({
     firstName: "",
     lastName: "",
@@ -23,7 +22,6 @@ export default function Dashboard() {
     profilePicture: ""
   });
 
-  // Password form state
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -64,13 +62,11 @@ export default function Dashboard() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       push("Please select an image file", "error");
       return;
     }
 
-    // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
       push("Image size should be less than 2MB", "error");
       return;
@@ -79,7 +75,6 @@ export default function Dashboard() {
     setUploadingImage(true);
 
     try {
-      // Convert to base64
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileForm({ ...profileForm, profilePicture: reader.result });
@@ -107,8 +102,8 @@ export default function Dashboard() {
     try {
       await api.post("/skills", skillData);
       push("Skill added successfully!", "success");
-      fetchUserProfile(); // Refresh to show new skill
-      fetchUserStats(); // Update stats
+      fetchUserProfile();
+      fetchUserStats();
     } catch (error) {
       push(error.response?.data?.message || "Failed to add skill", "error");
       throw error;
@@ -138,7 +133,7 @@ export default function Dashboard() {
     try {
       await api.delete(`/classes/${classId}`);
       push("Class deleted successfully", "success");
-      fetchUserClasses(); // Refresh classes
+      fetchUserClasses();
     } catch (error) {
       push(error.response?.data?.message || "Failed to delete class", "error");
     }
@@ -208,10 +203,8 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Section */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-lg p-8 mb-8 text-white">
           <div className="flex items-center space-x-6">
-            {/* Profile Picture */}
             <div className="relative">
               {userProfile.profilePicture ? (
                 <img
@@ -226,7 +219,6 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* User Info */}
             <div className="flex-1">
               <h1 className="text-3xl font-bold">
                 {userProfile.firstName} {userProfile.lastName}
@@ -245,14 +237,11 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Stats Cards */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            {/* Stats content (similar to your existing stats cards) */}
           </div>
         )}
 
-        {/* Tabs Section */}
         <div className="bg-white rounded-lg shadow mb-8">
           <div className="border-b border-gray-200">
             <nav className="flex -mb-px">
@@ -291,7 +280,6 @@ export default function Dashboard() {
           </div>
 
           <div className="p-6">
-            {/* Profile Tab */}
             {activeTab === "profile" && (
               <form onSubmit={handleProfileUpdate}>
                 <div className="space-y-6">
@@ -351,7 +339,6 @@ export default function Dashboard() {
                       Profile Picture
                     </label>
                     
-                    {/* Current Picture Preview */}
                     {profileForm.profilePicture && (
                       <div className="mb-4">
                         <div className="relative inline-block">
@@ -373,7 +360,6 @@ export default function Dashboard() {
                       </div>
                     )}
 
-                    {/* Upload Button */}
                     <div className="flex items-center gap-4">
                       <label className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium inline-flex items-center">
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -415,7 +401,6 @@ export default function Dashboard() {
               </form>
             )}
 
-            {/* Security Tab */}
             {activeTab === "security" && (
               <form onSubmit={handlePasswordUpdate}>
                 <div className="space-y-6">
@@ -479,7 +464,6 @@ export default function Dashboard() {
               </form>
             )}
 
-            {/* Skills Tab */}
             {activeTab === "skills" && (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
@@ -567,7 +551,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Add Skill Modal */}
       <AddSkillModal
         isOpen={showAddSkillModal}
         onClose={() => setShowAddSkillModal(false)}

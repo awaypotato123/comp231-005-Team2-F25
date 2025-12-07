@@ -50,13 +50,10 @@ export default function PublicProfile() {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
 
-      {/* Main grid layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
 
-        {/* Profile card left */}
         <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center border-t-4 border-blue-600">
 
-          {/* Avatar */}
           <div className="w-60 h-60 rounded-full overflow-hidden shadow mb-4 border-4 border-blue-600">
             {userProfile.profilePicture ? (
               <img
@@ -70,22 +67,18 @@ export default function PublicProfile() {
             )}
           </div>
 
-          {/* Name */}
           <h1 className="text-2xl font-bold text-gray-900">
             {userProfile.firstName} {userProfile.lastName}
           </h1>
 
-          {/* Email */}
           <p className="text-gray-500 mt-1">{userProfile.email}</p>
 
-          {/* Bio */}
           {userProfile.bio && (
             <p className="mt-4 text-gray-700 text-sm leading-relaxed px-2">
               {userProfile.bio}
             </p>
           )}
 
-          {/* Stats */}
           <div className="grid grid-cols-2 gap-3 w-full mt-6">
             <div className="bg-blue-50 rounded-lg p-3">
               <p className="text-lg font-bold text-blue-700 text-center">
@@ -103,10 +96,8 @@ export default function PublicProfile() {
           </div>
         </div>
 
-        {/* Right side content */}
         <div className="lg:col-span-2 flex flex-col gap-6">
 
-         {/* Skills horizontal slider */}
 <div
   className="bg-white rounded-xl shadow p-6 border-l-4 border-blue-600 flex flex-col"
   style={{ height: "170px" }}
@@ -150,7 +141,6 @@ export default function PublicProfile() {
   )}
 </div>
 
-          {/* Classes full expanded section */}
           <div className="bg-white rounded-xl shadow p-6 border-l-4 border-blue-600 flex-1 overflow-y-auto">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Classes</h2>
 

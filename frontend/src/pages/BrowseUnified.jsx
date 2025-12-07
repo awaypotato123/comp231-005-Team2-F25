@@ -8,8 +8,7 @@ import api from "../lib/api";
 
 export default function BrowseUnified() {
   const [searchParams, setSearchParams] = useSearchParams();
-  
-  // which type to browse: skills or classes
+
   const type = searchParams.get("type") || "skills";
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
@@ -24,7 +23,6 @@ export default function BrowseUnified() {
     levels: []
   });
 
-  // fetch skills or classes based on ?type=
   const fetchItems = async () => {
     try {
       setLoading(true);
@@ -45,7 +43,6 @@ export default function BrowseUnified() {
     fetchItems();
   }, [type]);
 
-  // shared unified search and filter logic
   useEffect(() => {
     applyFiltersAndSearch();
   }, [searchQuery, filters, items]);
@@ -53,7 +50,6 @@ export default function BrowseUnified() {
   const applyFiltersAndSearch = () => {
     let filtered = [...items];
 
-    // search
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
 
@@ -82,7 +78,6 @@ export default function BrowseUnified() {
       });
     }
 
-    // category filter
     if (filters.categories.length > 0) {
       filtered = filtered.filter((item) => {
         if (type === "skills") return filters.categories.includes(item.category);
@@ -90,7 +85,6 @@ export default function BrowseUnified() {
       });
     }
 
-    // level filter
     if (filters.levels.length > 0) {
       filtered = filtered.filter((item) => {
         if (type === "skills") return filters.levels.includes(item.level);
@@ -124,7 +118,6 @@ export default function BrowseUnified() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-4">
@@ -147,9 +140,7 @@ export default function BrowseUnified() {
         </div>
       </div>
 
-      {/* Main content */}
       <div className="max-w-7xl mx-auto px-6 py-8 flex gap-8">
-        {/* Filters */}
         <aside className="lg:w-64">
           <FilterSidebar
             filters={filters}
@@ -158,7 +149,6 @@ export default function BrowseUnified() {
           />
         </aside>
 
-        {/* Results */}
         <main className="flex-1">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
@@ -174,14 +164,12 @@ export default function BrowseUnified() {
             </p>
           </div>
 
-          {/* Loading */}
           {loading && (
             <div className="text-center py-12">
               <div className="animate-spin h-12 w-12 border-b-2 border-white"></div>
             </div>
           )}
 
-          {/* Error */}
           {error && (
             <div className="bg-red-50 border border-red-200 p-6 rounded-lg text-center">
               <p className="text-red-800">{error}</p>
@@ -194,7 +182,6 @@ export default function BrowseUnified() {
             </div>
           )}
 
-          {/* Empty */}
           {!loading && !error && filteredItems.length === 0 && (
             <div className="text-center bg-white p-10 rounded-lg border">
               <p className="text-gray-600">No results found</p>
@@ -207,7 +194,6 @@ export default function BrowseUnified() {
             </div>
           )}
 
-          {/* Grid */}
           {!loading && !error && filteredItems.length > 0 && (
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {filteredItems.map((item) =>

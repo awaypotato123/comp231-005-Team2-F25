@@ -37,12 +37,9 @@ export default function ManageClass() {
             
             alert(response.data.message);
             
-            // Refresh class data
             fetchClass();
-            
-            // Optionally refresh user credits in context
+
             const userRes = await api.get('/users/me');
-            // You might want to update user context here if you have it
             
         } catch (error) {
             console.error("Error completing class:", error);
@@ -72,10 +69,8 @@ export default function ManageClass() {
         <div className="min-h-screen bg-gray-100 py-10 px-6">
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
                 
-                {/* LEFT SIDE - CLASS DETAILS */}
                 <div className="space-y-8">
 
-                    {/* Header + Stats */}
                     <div className="bg-white shadow rounded-xl p-8">
                         <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
@@ -115,7 +110,6 @@ export default function ManageClass() {
 
                         </div>
 
-                        {/* Action Buttons */}
                         <div className="mt-8 flex gap-4">
                             <button
                                 onClick={() => navigate(`/edit-class/${classData._id}`)}
@@ -152,7 +146,6 @@ export default function ManageClass() {
                         )}
                     </div>
 
-                    {/* Student List */}
                     <div className="bg-white shadow rounded-xl p-8">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">Students Enrolled</h2>
 
@@ -208,7 +201,6 @@ export default function ManageClass() {
 
                 </div>
 
-                {/* RIGHT SIDE - EMPTY FUNCTIONALITY BOX */}
                 <div className="space-y-8">
                     <div className="space-y-8">
                         <InstructorPanel 

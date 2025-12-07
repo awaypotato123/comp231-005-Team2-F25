@@ -31,7 +31,6 @@ export default function AddSkillModal({ isOpen, onClose, onSkillAdded }) {
     setLoading(true);
     try {
       await onSkillAdded(form);
-      // Reset form
       setForm({
         title: "",
         description: "",
@@ -64,7 +63,6 @@ export default function AddSkillModal({ isOpen, onClose, onSkillAdded }) {
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* Title */}
           <div className="mb-4">
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
               Skill Title <span className="text-red-500">*</span>
@@ -81,7 +79,6 @@ export default function AddSkillModal({ isOpen, onClose, onSkillAdded }) {
             />
           </div>
 
-          {/* Description */}
           <div className="mb-4">
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
               Description
@@ -100,7 +97,6 @@ export default function AddSkillModal({ isOpen, onClose, onSkillAdded }) {
             </p>
           </div>
 
-          {/* Category */}
           <div className="mb-4">
             <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
               Category <span className="text-red-500">*</span>
@@ -122,7 +118,6 @@ export default function AddSkillModal({ isOpen, onClose, onSkillAdded }) {
             </select>
           </div>
 
-          {/* Level */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Skill Level <span className="text-red-500">*</span>
@@ -190,7 +185,6 @@ export default function AddSkillModal({ isOpen, onClose, onSkillAdded }) {
             </div>
           </div>
 
-          {/* Buttons */}
           <div className="flex gap-3">
             <button
               type="button"

@@ -20,7 +20,6 @@ export default function BookingModal({ isOpen, onClose, skill, teacher, classDat
     setLoading(true);
 
     try {
-      // Get skill and teacher info from props or classData
       const skillId = skill?._id || classData?.skill?._id || classData?.skill;
       const teacherId = teacher?._id || classData?.user;
 
@@ -36,24 +35,20 @@ export default function BookingModal({ isOpen, onClose, skill, teacher, classDat
         ...formData
       };
 
-      // If this is a class booking, add classId
       if (classData && classData._id) {
         bookingData.classId = classData._id;
       }
 
-      // FIXED: Define response variable
       const response = await api.post('/bookings', bookingData);
 
       push(response.data.message || "Booking created successfully!", "success");
       
-      // Call onBookingComplete callback if provided
       if (onBookingComplete && response.data.learnerCredits) {
         onBookingComplete(response.data.learnerCredits);
       }
       
       onClose();
-      
-      // Refresh page to show updated bookings
+
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -70,7 +65,6 @@ export default function BookingModal({ isOpen, onClose, skill, teacher, classDat
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-bold text-gray-900">
             {classData ? "Request to Join Class" : "Book a Session"}
@@ -85,9 +79,7 @@ export default function BookingModal({ isOpen, onClose, skill, teacher, classDat
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6">
-          {/* Class/Skill Info */}
           <div className="mb-6 p-4 bg-blue-50 rounded-lg">
             <h3 className="font-semibold text-gray-900">
               {classData?.title || skill?.title || "Class"}
@@ -111,7 +103,6 @@ export default function BookingModal({ isOpen, onClose, skill, teacher, classDat
             )}
           </div>
 
-          {/* Check if user has enough credits */}
           {user && user.credits < 1 ? (
             <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-red-700 text-sm">
@@ -120,9 +111,7 @@ export default function BookingModal({ isOpen, onClose, skill, teacher, classDat
             </div>
           ) : null}
 
-          {/* Booking Form */}
           <form onSubmit={handleSubmit}>
-            {/* Message */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Message to Teacher
@@ -136,7 +125,6 @@ export default function BookingModal({ isOpen, onClose, skill, teacher, classDat
               />
             </div>
 
-            {/* Preferred Date */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Preferred Date
@@ -150,7 +138,6 @@ export default function BookingModal({ isOpen, onClose, skill, teacher, classDat
               />
             </div>
 
-            {/* Preferred Time */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Preferred Time
@@ -163,7 +150,6 @@ export default function BookingModal({ isOpen, onClose, skill, teacher, classDat
               />
             </div>
 
-            {/* Duration */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Session Duration
@@ -186,7 +172,6 @@ export default function BookingModal({ isOpen, onClose, skill, teacher, classDat
               </div>
             </div>
 
-            {/* Buttons */}
             <div className="flex gap-3">
               <button
                 type="button"

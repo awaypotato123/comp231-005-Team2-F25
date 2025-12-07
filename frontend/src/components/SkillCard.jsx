@@ -9,7 +9,6 @@ export default function SkillCard({ skill }) {
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
-      {/* Header */}
       <div className="flex justify-between items-start mb-3">
         <h3 className="text-lg font-semibold text-gray-900 flex-1">
           {skill.title}
@@ -23,12 +22,10 @@ export default function SkillCard({ skill }) {
         </span>
       </div>
 
-      {/* Description */}
       <p className="text-sm text-gray-600 mb-4 line-clamp-2">
         {skill.description || "No description available"}
       </p>
 
-      {/* Category */}
       {skill.category && (
         <div className="mb-4">
           <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md">
@@ -37,7 +34,6 @@ export default function SkillCard({ skill }) {
         </div>
       )}
 
-      {/* Teacher Info */}
       <div className="flex items-center justify-between pt-4 border-t border-gray-100">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white text-sm font-medium">

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext"; 
 import api from '../lib/api';
 import { Link } from "react-router-dom";
-import BookingModal from './BookingModal';
+import BookingModal from './Bookingmodal';
 
 export default function ClassCard({ classData }) {
   const { title, description, skill, userName, maxStudents, rating } = classData;
@@ -13,10 +13,9 @@ export default function ClassCard({ classData }) {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  // Open booking modal
   const handleRequestBooking = () => {
-    closeModal();  // Close details modal
-    setIsBookingModalOpen(true);  // Open booking modal
+    closeModal();
+    setIsBookingModalOpen(true);
   };
 
   return (
@@ -42,7 +41,6 @@ export default function ClassCard({ classData }) {
         </button>
       </div>
 
-      {/* Details Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-2xl w-[80vw] max-w-3xl shadow-lg">
@@ -58,7 +56,6 @@ export default function ClassCard({ classData }) {
               <span className="text-yellow-500 text-lg">⭐ {rating || "N/A"}</span>
             </div>
 
-            {/* Credit info */}
             {user && (
               <div className="mt-4 p-4 bg-blue-50 rounded-lg">
                 <p className="text-sm text-gray-700">
@@ -104,14 +101,13 @@ export default function ClassCard({ classData }) {
         </div>
       )}
 
-      {/* Booking Modal - FIXED PROPS */}
       {isBookingModalOpen && (
         <BookingModal
           isOpen={isBookingModalOpen}
           onClose={() => setIsBookingModalOpen(false)}
-          skill={skill}  // FIXED: Pass skill object
-          teacher={{ _id: classData.user, firstName: userName.split(' ')[0], lastName: userName.split(' ')[1] || '' }}  // FIXED: Create teacher object
-          classData={classData}  // Pass the full class data
+          skill={skill}
+          teacher={{ _id: classData.user, firstName: userName.split(' ')[0], lastName: userName.split(' ')[1] || '' }}
+          classData={classData}
         />
       )}
     </div>

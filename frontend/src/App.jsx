@@ -6,7 +6,6 @@ import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import MyBookings from './pages/MyBookings';
 import BookingRequests from './pages/BookingRequests';
-// import Browse from './pages/Browse';
 import SkillDetail from './pages/SkillDetail';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -43,9 +42,7 @@ export default function App() {
 <Route path="/browse" element={<BrowseUnified />} />
             <Route path="/skills/:id" element={<SkillDetail />} />
             <Route path="/classes" element={<Classes />} />
-            {/* Protected route: User must be logged in */}
             <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-            {/* Admin route: Only accessible to users with 'admin' role */}
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="/create-class" element={<CreateClass />} />
             <Route path="/edit-class/:classId" element={<EditClass />} />

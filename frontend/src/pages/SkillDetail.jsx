@@ -13,7 +13,6 @@ export default function SkillDetail() {
   const [error, setError] = useState(null);
   const [requesting, setRequesting] = useState(false);
 
-  // Fetch skill details on mount / id change
   useEffect(() => {
     fetchSkillDetails();
   }, [id]);
@@ -96,7 +95,6 @@ export default function SkillDetail() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <button
@@ -125,10 +123,8 @@ export default function SkillDetail() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          {/* Description */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">About This Skill</h2>
             <p className="text-gray-700 leading-relaxed">
@@ -136,7 +132,6 @@ export default function SkillDetail() {
             </p>
           </div>
 
-          {/* Instructor Info */}
           <div className="mb-8 pb-8 border-b border-gray-200">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Instructor</h2>
             <div className="flex items-center space-x-4">
@@ -155,7 +150,6 @@ export default function SkillDetail() {
             </div>
           </div>
 
-          {/* Details Grid */}
           <div className="grid sm:grid-cols-3 gap-6 mb-8">
             <div className="bg-blue-50 p-4 rounded-lg text-center">
               <p className="text-sm text-gray-600 mb-1">Skill Level</p>
@@ -177,7 +171,6 @@ export default function SkillDetail() {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-4">
             {user ? (
               <>
@@ -204,7 +197,6 @@ export default function SkillDetail() {
           </div>
         </div>
 
-        {/* Related Skills Section */}
         <div className="mt-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             More Skills in {skill.category}

@@ -242,9 +242,7 @@ export default function Admin() {
           </ul>
         </aside>
 
-        {/* Main Content Area */}
         <main className="flex-1 p-6 overflow-y-auto bg-gray-50">
-          {/* Dashboard Section */}
           {activeSection === "dashboard" && stats && (
             <section>
               <h2 className="text-2xl font-semibold mb-6">Dashboard Overview</h2>

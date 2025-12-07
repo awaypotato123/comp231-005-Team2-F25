@@ -64,7 +64,6 @@ export default function MyBookings() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">My Bookings</h1>
           <p className="text-gray-600 mt-2">
@@ -72,7 +71,6 @@ export default function MyBookings() {
           </p>
         </div>
 
-        {/* Bookings List */}
         {bookings.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-12 text-center">
             <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,7 +106,6 @@ export default function MyBookings() {
                   {getStatusBadge(booking.status)}
                 </div>
 
-                {/* Booking Details */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   {booking.preferredDate && (
                     <div>
@@ -130,7 +127,6 @@ export default function MyBookings() {
                   </div>
                 </div>
 
-                {/* Your Message */}
                 {booking.message && (
                   <div className="mb-4 p-3 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-500 mb-1">Your Message:</p>
@@ -138,7 +134,6 @@ export default function MyBookings() {
                   </div>
                 )}
 
-                {/* Teacher Response */}
                 {booking.teacherResponse && (
                   <div className="mb-4 p-3 bg-blue-50 rounded-lg">
                     <p className="text-sm text-blue-600 mb-1 font-medium">
@@ -148,7 +143,6 @@ export default function MyBookings() {
                   </div>
                 )}
 
-                {/* Meeting Link */}
                 {booking.meetingLink && booking.status === "accepted" && (
                   <div className="mb-4 p-3 bg-green-50 rounded-lg">
                     <p className="text-sm text-green-600 mb-2 font-medium">
@@ -165,7 +159,6 @@ export default function MyBookings() {
                   </div>
                 )}
 
-                {/* Actions */}
                 <div className="flex gap-3 pt-4 border-t">
                   {booking.status === "pending" && (
                     <button
