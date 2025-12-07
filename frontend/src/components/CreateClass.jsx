@@ -74,7 +74,7 @@ export default function CreateClass() {
     console.log("Sending class data:", newClass); // Debug log
 
     try {
-      const response = await api.post("/classes/create", newClass);
+      await api.post("/classes", newClass);
       push("Class created successfully!", "success");
       navigate("/classroom");
     } catch (error) {

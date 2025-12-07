@@ -35,16 +35,21 @@ const UserSchema = new mongoose.Schema({
   profilePicture: {
     type: String,
     default: "",
-    maxlength: 5000000 
+    maxlength: 5000000
   },
   role: {
     type: String,
-    enum: ["learner","teacher", "admin","user"],
+    enum: ["learner", "teacher", "admin","user"],
     default: "learner"
   },
   credits: {
     type: Number,
-    default: 1,
+    default: 1,  // Everyone starts with 1 credit
+    min: 0
+  },
+  pendingCredits: {
+    type: Number,
+    default: 0,  // Credits held in active bookings
     min: 0
   },
   skills: [
@@ -84,6 +89,7 @@ UserSchema.methods = {
       return "";
     }
   },
+
   makeSalt: function() {
     return Math.round(new Date().valueOf() * Math.random()) + "";
   }

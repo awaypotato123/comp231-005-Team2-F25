@@ -1,53 +1,23 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext"; 
-import api from '../lib/api'
+import api from '../lib/api';
 import { Link } from "react-router-dom";
+import BookingModal from './BookingModal';
 
 export default function ClassCard({ classData }) {
   const { title, description, skill, userName, maxStudents, rating } = classData;
-  const { user, setUser } = useAuth(); // Include setUser to update context
+  const { user, setUser } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-const joinClass = async () => {
-  if (!user) return alert("You must be signed in to join a class.");
-  if (user.credits < 1) return alert("Not enough credits to join this class.");
 
-  try {
-    await api.post(`/classes/join/${classData._id}`);
-
-    const newStudentCredits = user.credits - 1;
-
-    const studentRes = await api.put("/users/update-credits", {
-      credits: newStudentCredits
-    });
-
-    if (studentRes?.data?.credits !== undefined) {
-      setUser({
-        ...user,
-        credits: studentRes.data.credits
-      });
-    }
-
-    // Increment instructor credits
-    if (classData.user !== user._id) {
-      await api.put("/users/update-credits-by-id", {
-        userId: classData.user,
-        credits: 1    // this will increment once backend is updated
-      });
-    }
-
-    alert("Joined class successfully. Credits updated.");
-    closeModal();
-
-  } catch (err) {
-    console.error("Join error:", err);
-    alert(err.response?.data?.message || "Could not join this class");
-  }
-};
-
-
+  // Open booking modal
+  const handleRequestBooking = () => {
+    closeModal();  // Close details modal
+    setIsBookingModalOpen(true);  // Open booking modal
+  };
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow hover:shadow-md p-4 flex flex-col">
@@ -72,6 +42,7 @@ const joinClass = async () => {
         </button>
       </div>
 
+      {/* Details Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-2xl w-[80vw] max-w-3xl shadow-lg">
@@ -87,13 +58,31 @@ const joinClass = async () => {
               <span className="text-yellow-500 text-lg">⭐ {rating || "N/A"}</span>
             </div>
 
+            {/* Credit info */}
+            {user && (
+              <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Cost:</span> 1 credit
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Your credits:</span> {user.credits} available
+                  {user.pendingCredits > 0 && ` + ${user.pendingCredits} pending`}
+                </p>
+              </div>
+            )}
+
             <div className="mt-6 flex justify-end space-x-4">
               {user ? (
                 <button
-                  onClick={joinClass}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium"
+                  onClick={handleRequestBooking}
+                  disabled={user.credits < 1}
+                  className={`px-6 py-3 rounded-lg font-medium ${
+                    user.credits < 1
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                  }`}
                 >
-                  Join Class
+                  Request to Join (1 Credit)
                 </button>
               ) : (
                 <div className="w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg text-center">
@@ -113,6 +102,17 @@ const joinClass = async () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Booking Modal - FIXED PROPS */}
+      {isBookingModalOpen && (
+        <BookingModal
+          isOpen={isBookingModalOpen}
+          onClose={() => setIsBookingModalOpen(false)}
+          skill={skill}  // FIXED: Pass skill object
+          teacher={{ _id: classData.user, firstName: userName.split(' ')[0], lastName: userName.split(' ')[1] || '' }}  // FIXED: Create teacher object
+          classData={classData}  // Pass the full class data
+        />
       )}
     </div>
   );

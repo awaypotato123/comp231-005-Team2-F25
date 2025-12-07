@@ -1,48 +1,42 @@
 import express from 'express';
 import { 
-  createClass, 
-  getClasses, 
-  getClassById, 
-  updateClass, 
-  deleteClass, 
-  joinClass, 
-  getUserClasses, 
-  getClassStudents,
-  getMyCreatedClasses,
-  getClassForStudent
-} from '../controllers/class.controller.js';  // Import the class controller methods
-import { protect } from '../middleware/auth.middleware.js';  // Import the authentication middleware
+    createClass, 
+    getClasses, 
+    getClassById, 
+    updateClass, 
+    deleteClass, 
+    joinClass,
+    completeClass,
+    getUserClasses, 
+    getMyCreatedClasses, 
+    getClassStudents,
+    getClassForStudent
+} from '../controllers/class.controller.js';
+import { protect } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-// POST: Create a new class (authentication required)
-router.post('/create', protect, createClass);  
-
-// GET: Get all classes (authentication required)
+// Public routes
 router.get('/', getClasses);
 
-//GET: Get all classes the user has created
-router.get('/instructor', protect, getMyCreatedClasses);
+// Protected routes
+router.post('/', protect, createClass);
 
-// GET: Get a single class by classId (authentication required)
-router.get('/:classId', protect, getClassById); 
+// IMPORTANT: Specific routes MUST come BEFORE parameterized routes!
+// Put all /specific-name routes before /:classId
 
-// PUT: Update a class by classId (authentication required)
-router.put('/:classId', protect, updateClass); 
+router.get('/user/classes', protect, getUserClasses);
+router.get('/instructor', protect, getMyCreatedClasses);  // ✅ BEFORE /:classId
 
-// DELETE: Delete a class by classId (authentication required)
+// Parameterized routes (with :classId) come AFTER specific routes
+router.get('/:classId', protect, getClassById);
+router.put('/:classId', protect, updateClass);
 router.delete('/:classId', protect, deleteClass);
+router.get('/:classId/students', protect, getClassStudents);
+router.put('/:classId/complete', protect, completeClass);
 
-// POST: Join a class (authentication required)
-router.post('/join/:classId', protect, joinClass);  // New route for joining a class
-
-// GET: Get all classes the user is enrolled in (authentication required)
-router.get('/user/classes', protect, getUserClasses);  // Get the classes a user has joined
-
-// GET: Get all students in a class (authentication required)
-router.get('/:classId/students', protect, getClassStudents);  // Get the students in a specific class
-
-// GET: Get class details for a student (authentication required)
-router.get('/student/:classId', protect, getClassForStudent);  // Get class details for a student
+// Routes with :classId in the middle
+router.post('/join/:classId', protect, joinClass);
+router.get('/student/:classId', protect, getClassForStudent);
 
 export default router;

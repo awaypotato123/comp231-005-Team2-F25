@@ -11,6 +11,7 @@ import adminRoutes from "./routes/admin.route.js";
 import classRoutes from "./routes/class.route.js";
 import classPostsRoutes from "./routes/classpost.route.js";
 import feedbackRoutes from "./routes/feedback.route.js";
+import bookingRoutes from './routes/booking.route.js';
 
 // Load environment variables FIRST
 dotenv.config();
@@ -37,6 +38,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/classposts", classPostsRoutes);
 app.use("/api/feedbacks", feedbackRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Home route
 app.get("/", (req, res) => {

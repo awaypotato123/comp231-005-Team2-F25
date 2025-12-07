@@ -4,6 +4,8 @@ import Home from './pages/Home';
 import Classes from './pages/Classes';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
+import MyBookings from './pages/MyBookings';
+import BookingRequests from './pages/BookingRequests';
 // import Browse from './pages/Browse';
 import SkillDetail from './pages/SkillDetail';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -53,6 +55,8 @@ export default function App() {
             <Route path="/profile/:userId" element={<PublicProfile />} />
             <Route path="/feedback/:classId" element={<Feedback />} />
             <Route path="/instructor-feedback" element={<InstructorFeedback />} />
+            <Route path="/my-bookings" element={<PrivateRoute><MyBookings /></PrivateRoute>} />
+            <Route path="/booking-requests" element={<PrivateRoute><BookingRequests /></PrivateRoute>} />
           </Routes>
         </div>
       </ToastProvider>

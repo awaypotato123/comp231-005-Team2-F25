@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import InstructorPanel from "./InstructorPanel";
-
 import api from "../lib/api";
 
 export default function ManageClass() {
     const { classId } = useParams();
     const [classData, setClassData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [completing, setCompleting] = useState(false);
     const navigate = useNavigate();
-
 
     const fetchClass = async () => {
         try {
@@ -26,6 +25,32 @@ export default function ManageClass() {
     useEffect(() => {
         fetchClass();
     }, [classId]);
+
+    const handleCompleteClass = async () => {
+        if (!window.confirm("Mark this class as complete? This will transfer credits from students to you.")) {
+            return;
+        }
+
+        try {
+            setCompleting(true);
+            const response = await api.put(`/classes/${classId}/complete`);
+            
+            alert(response.data.message);
+            
+            // Refresh class data
+            fetchClass();
+            
+            // Optionally refresh user credits in context
+            const userRes = await api.get('/users/me');
+            // You might want to update user context here if you have it
+            
+        } catch (error) {
+            console.error("Error completing class:", error);
+            alert(error.response?.data?.message || "Failed to mark class as complete");
+        } finally {
+            setCompleting(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -52,9 +77,18 @@ export default function ManageClass() {
 
                     {/* Header + Stats */}
                     <div className="bg-white shadow rounded-xl p-8">
-                        <h1 className="text-3xl font-bold text-gray-900">
-                            Class Name: {classData.title}
-                        </h1>
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                                <h1 className="text-3xl font-bold text-gray-900">
+                                    {classData.title}
+                                </h1>
+                                {classData.completed && (
+                                    <span className="inline-block mt-2 px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+                                        ✓ Completed
+                                    </span>
+                                )}
+                            </div>
+                        </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
 
@@ -81,12 +115,41 @@ export default function ManageClass() {
 
                         </div>
 
-                        <button
-                            onClick={() => navigate(`/edit-class/${classData._id}`)}
-                            className="mt-8 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium"
-                        >
-                            Edit This Class
-                        </button>
+                        {/* Action Buttons */}
+                        <div className="mt-8 flex gap-4">
+                            <button
+                                onClick={() => navigate(`/edit-class/${classData._id}`)}
+                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium"
+                            >
+                                Edit This Class
+                            </button>
+
+                            {!classData.completed && classData.students?.length > 0 && (
+                                <button
+                                    onClick={handleCompleteClass}
+                                    disabled={completing}
+                                    className="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {completing ? 'Completing...' : '✓ Mark Complete & Earn Credits'}
+                                </button>
+                            )}
+                        </div>
+
+                        {classData.completed && (
+                            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                                <p className="text-green-800 text-sm">
+                                    ✓ This class has been completed. Credits have been transferred.
+                                </p>
+                            </div>
+                        )}
+
+                        {!classData.completed && classData.students?.length === 0 && (
+                            <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                                <p className="text-gray-600 text-sm">
+                                    💡 You can mark the class as complete once students join.
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Student List */}
@@ -108,14 +171,13 @@ export default function ManageClass() {
 
                                     <tbody>
                                         {classData.students.map((student, index) => {
-                                            // Handle both populated and non-populated students
                                             const isPopulated = typeof student === 'object' && student !== null;
                                             const studentName = isPopulated 
                                                 ? `${student.firstName} ${student.lastName}` 
                                                 : 'Unknown';
                                             const studentEmail = isPopulated 
                                                 ? student.email 
-                                                : student; // Show ID if not populated
+                                                : student;
 
                                             return (
                                                 <tr

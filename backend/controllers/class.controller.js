@@ -8,32 +8,27 @@ const router = express.Router();
 // ------------------------------ CREATE CLASS ------------------------------
 export const createClass = async (req, res) => {
     try {
-        const { title, description, skillId, date, maxStudents } = req.body;  // Changed skillTitle to skillId
+        const { title, description, skillId, date, maxStudents } = req.body;
         const userId = req.user.id;
 
-        // Validate required fields
         if (!title || !skillId || !date || !maxStudents) {
             return res.status(400).json({ 
                 message: "Missing required fields: title, skillId, date, and maxStudents are required" 
             });
         }
 
-        // Find the user by userId to get their firstName and lastName
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Create the user's full name
         const userFullName = `${user.firstName} ${user.lastName}`;
-
-        // Find the skill by ID and verify it belongs to the user
-        const skill = await Skill.findOne({ _id: skillId, userId });  // Changed to find by _id
+        const skill = await Skill.findOne({ _id: skillId, userId });
+        
         if (!skill) {
             return res.status(400).json({ message: "Skill not found or does not belong to you" });
         }
 
-        // Create a new class with the retrieved information
         const newClass = new Class({
             title,
             description: description || skill.description,
@@ -41,10 +36,9 @@ export const createClass = async (req, res) => {
             user: userId,
             userName: userFullName,
             date,
-            maxStudents: parseInt(maxStudents)  // Ensure it's a number
+            maxStudents: parseInt(maxStudents)
         });
 
-        // Save the new class to the database
         await newClass.save();
         res.status(201).json({ message: 'Class created successfully', class: newClass });
     } catch (error) {
@@ -74,7 +68,6 @@ export const getClassById = async (req, res) => {
         const { classId } = req.params;
         const userId = req.user.id;
 
-        // Find the class by ID
         const classData = await Class.findById(classId)
             .populate('skill', 'title category level')
             .populate('students', 'firstName lastName email');
@@ -83,7 +76,6 @@ export const getClassById = async (req, res) => {
             return res.status(404).json({ message: "Class not found" });
         }
 
-        // Check if user is the instructor OR is enrolled as a student
         const isInstructor = classData.user.toString() === userId;
         const isEnrolled = classData.students.some(student => student._id.toString() === userId);
 
@@ -93,7 +85,6 @@ export const getClassById = async (req, res) => {
             });
         }
 
-        // Return full class data
         res.status(200).json(classData);
     } catch (error) {
         console.error("Get class by ID error:", error);
@@ -105,11 +96,10 @@ export const getClassById = async (req, res) => {
 export const updateClass = async (req, res) => {
     try {
         const { classId } = req.params;
-        const { title, description, skillId, date, maxStudents } = req.body;  // Changed skillTitle to skillId
+        const { title, description, skillId, date, maxStudents } = req.body;
         const userId = req.user.id;
 
-        // Find the skill by ID and userId to make sure it belongs to the current user
-        const skill = await Skill.findOne({ _id: skillId, userId });  // Changed to find by _id
+        const skill = await Skill.findOne({ _id: skillId, userId });
         if (!skill) {
             return res.status(400).json({ message: "Skill not found or does not belong to you" });
         }
@@ -153,14 +143,16 @@ export const deleteClass = async (req, res) => {
     }
 };
 
-// ------------------------------ JOIN CLASS ------------------------------ 
+// ------------------------------ JOIN CLASS WITH PENDING CREDITS ------------------------------
 export const joinClass = async (req, res) => {
     try {
         const { classId } = req.params;
         const userId = req.user.id;
 
         const classData = await Class.findById(classId);
-        if (!classData) return res.status(404).json({ message: "Class not found" });
+        if (!classData) {
+            return res.status(404).json({ message: "Class not found" });
+        }
 
         if (classData.students.includes(userId)) {
             return res.status(400).json({ message: "You have already joined this class" });
@@ -170,13 +162,100 @@ export const joinClass = async (req, res) => {
             return res.status(400).json({ message: "Class is full" });
         }
 
+        if (classData.user.toString() === userId) {
+            return res.status(400).json({ message: "You cannot join your own class" });
+        }
+
+        const student = await User.findById(userId);
+        const instructor = await User.findById(classData.user);
+
+        if (!student || !instructor) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (student.credits < 1) {
+            return res.status(400).json({ 
+                message: "Insufficient credits. You need 1 credit to join a class." 
+            });
+        }
+
+        // Move credit to pending
+        student.credits -= 1;
+        student.pendingCredits += 1;
+        await student.save();
+
+        // Add student to class
         classData.students.push(userId);
         await classData.save();
 
-        res.status(200).json({ message: "Successfully joined the class", class: classData });
+        res.status(200).json({ 
+            message: "Successfully joined the class! 1 credit moved to pending.",
+            class: classData,
+            studentCredits: {
+                available: student.credits,
+                pending: student.pendingCredits
+            }
+        });
     } catch (error) {
-        console.error(error);
+        console.error("Join class error:", error);
         res.status(500).json({ message: "Server error while joining the class" });
+    }
+};
+
+// ------------------------------ COMPLETE CLASS (Transfer Credits) ------------------------------
+export const completeClass = async (req, res) => {
+    try {
+        const { classId } = req.params;
+        const userId = req.user.id;
+
+        const classData = await Class.findById(classId);
+        if (!classData) {
+            return res.status(404).json({ message: "Class not found" });
+        }
+
+        // Only instructor can mark class as complete
+        if (classData.user.toString() !== userId) {
+            return res.status(403).json({ 
+                message: "Only the instructor can mark this class as complete" 
+            });
+        }
+
+        // Check if already completed
+        if (classData.completed) {
+            return res.status(400).json({ 
+                message: "This class has already been marked as complete" 
+            });
+        }
+
+        // Transfer credits from all students' pending to instructor
+        const instructor = await User.findById(userId);
+        const students = await User.find({ _id: { $in: classData.students } });
+
+        let totalCredits = 0;
+        for (const student of students) {
+            if (student.pendingCredits > 0) {
+                student.pendingCredits -= 1;
+                await student.save();
+                totalCredits += 1;
+            }
+        }
+
+        // Add credits to instructor
+        instructor.credits += totalCredits;
+        await instructor.save();
+
+        // Mark class as completed
+        classData.completed = true;
+        await classData.save();
+
+        res.status(200).json({
+            message: `Class completed! You earned ${totalCredits} credit${totalCredits !== 1 ? 's' : ''}.`,
+            creditsEarned: totalCredits,
+            totalCredits: instructor.credits
+        });
+    } catch (error) {
+        console.error("Complete class error:", error);
+        res.status(500).json({ message: "Server error completing class" });
     }
 };
 

@@ -125,7 +125,7 @@ export default function Classroom() {
     <div className="flex h-screen">
 
       {/* Sidebar */}
-      <div className="w-64 bg-gray-800 text-white p-6 fixed h-full">
+      <div className="w-64 bg-gray-800 text-white p-6 fixed h-full overflow-y-auto">
         <div
           className={`cursor-pointer p-4 mb-4 rounded-lg hover:bg-slate-50 hover:text-blue-700 transition ${
             activePortal === "student" ? "bg-blue-700" : ""
@@ -151,12 +151,28 @@ export default function Classroom() {
           My Public Profile
         </div>
 
-        {/* NEW: My Feedback Link */}
+        {/* My Feedback Link */}
         <div
           className="cursor-pointer p-4 mb-4 rounded-lg hover:bg-green-700 text-white transition bg-gray-700"
           onClick={() => navigate("/instructor-feedback")}
         >
           📊 My Feedback
+        </div>
+
+        {/* NEW: My Bookings (Student) */}
+        <div
+          className="cursor-pointer p-4 mb-4 rounded-lg hover:bg-purple-700 text-white transition bg-gray-700"
+          onClick={() => navigate("/my-bookings")}
+        >
+          📋 My Bookings
+        </div>
+
+        {/* NEW: Booking Requests (Instructor) */}
+        <div
+          className="cursor-pointer p-4 mb-4 rounded-lg hover:bg-orange-700 text-white transition bg-gray-700"
+          onClick={() => navigate("/booking-requests")}
+        >
+          📬 Booking Requests
         </div>
       </div>
 
