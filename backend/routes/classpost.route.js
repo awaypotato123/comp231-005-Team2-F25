@@ -3,7 +3,6 @@ import ClassPost from "../models/classPost.js";
 
 const router = express.Router();
 
-// GET all posts for a class
 router.get("/:classId", async (req, res) => {
   try {
     const posts = await ClassPost.find({ classId: req.params.classId })
@@ -16,7 +15,6 @@ router.get("/:classId", async (req, res) => {
   }
 });
 
-// CREATE a post
 router.post("/:classId", async (req, res) => {
   try {
     const { userId, message } = req.body;
@@ -40,7 +38,6 @@ router.post("/:classId", async (req, res) => {
   }
 });
 
-// REACT to a post
 router.post("/react/:postId", async (req, res) => {
   try {
     const { reaction } = req.body;
@@ -49,7 +46,6 @@ router.post("/react/:postId", async (req, res) => {
 
     if (!post) return res.status(404).json({ error: "Post not found" });
 
-    // validate reaction type properly
     if (!(reaction in post.reactions)) {
       return res.status(400).json({ error: "Invalid reaction type" });
     }
@@ -63,7 +59,6 @@ router.post("/react/:postId", async (req, res) => {
   }
 });
 
-// DELETE a post
 router.delete("/:postId", async (req, res) => {
   try {
     await ClassPost.findByIdAndDelete(req.params.postId);

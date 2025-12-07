@@ -18,10 +18,10 @@ export const protect = (req, res, next) => {
       });
     }
 
-    // Verify the token and extract user data
+   
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Attach user data to the request object
+    
     req.user = {
       id: decoded.userId,
       firstName: decoded.firstName,

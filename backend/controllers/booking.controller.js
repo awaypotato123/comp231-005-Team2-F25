@@ -2,56 +2,46 @@ import Booking from "../models/Booking.js";
 import User from "../models/User.js";
 import Skill from "../models/Skill.js";
 
-// ============================================
-// CREATE BOOKING (Learner books a session)
-// ============================================
 export const createBooking = async (req, res) => {
   try {
     const { skillId, teacherId, classId, message, preferredDate, preferredTime, duration } = req.body;
     const learnerId = req.user.id;
 
-    // Validate required fields
     if (!skillId || !teacherId) {
       return res.status(400).json({ message: "Skill and teacher are required" });
     }
 
-    // Check if learner has enough credits
     const learner = await User.findById(learnerId);
     if (!learner) {
       return res.status(404).json({ message: "Learner not found" });
     }
 
     if (learner.credits < 1) {
-      return res.status(400).json({ 
-        message: "Insufficient credits. You need 1 credit to book a session." 
+      return res.status(400).json({
+        message: "Insufficient credits. You need 1 credit to book a session."
       });
     }
 
-    // Check if teacher exists
     const teacher = await User.findById(teacherId);
     if (!teacher) {
       return res.status(404).json({ message: "Teacher not found" });
     }
 
-    // Check if skill exists
     const skill = await Skill.findById(skillId);
     if (!skill) {
       return res.status(404).json({ message: "Skill not found" });
     }
 
-    // Check if learner is trying to book their own skill
     if (learnerId === teacherId) {
-      return res.status(400).json({ 
-        message: "You cannot book a session with yourself" 
+      return res.status(400).json({
+        message: "You cannot book a session with yourself"
       });
     }
 
-    // Move credit to pending (hold it, don't spend it yet)
     learner.credits -= 1;
     learner.pendingCredits += 1;
     await learner.save();
 
-    // Create booking
     const booking = await Booking.create({
       learnerId,
       teacherId,
@@ -65,7 +55,6 @@ export const createBooking = async (req, res) => {
       status: "pending"
     });
 
-    // Populate booking details
     const populatedBooking = await Booking.findById(booking._id)
       .populate("learnerId", "firstName lastName email credits pendingCredits")
       .populate("teacherId", "firstName lastName email credits")
@@ -85,9 +74,6 @@ export const createBooking = async (req, res) => {
   }
 };
 
-// ============================================
-// GET MY BOOKINGS (as learner)
-// ============================================
 export const getMyBookingsAsLearner = async (req, res) => {
   try {
     const learnerId = req.user.id;
@@ -104,9 +90,6 @@ export const getMyBookingsAsLearner = async (req, res) => {
   }
 };
 
-// ============================================
-// GET BOOKING REQUESTS (as teacher)
-// ============================================
 export const getMyBookingsAsTeacher = async (req, res) => {
   try {
     const teacherId = req.user.id;
@@ -123,9 +106,6 @@ export const getMyBookingsAsTeacher = async (req, res) => {
   }
 };
 
-// ============================================
-// GET SINGLE BOOKING
-// ============================================
 export const getBookingById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -140,11 +120,10 @@ export const getBookingById = async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    // Check if user is part of this booking
-    if (booking.learnerId._id.toString() !== userId && 
+    if (booking.learnerId._id.toString() !== userId &&
         booking.teacherId._id.toString() !== userId) {
-      return res.status(403).json({ 
-        message: "You don't have permission to view this booking" 
+      return res.status(403).json({
+        message: "You don't have permission to view this booking"
       });
     }
 
@@ -155,9 +134,6 @@ export const getBookingById = async (req, res) => {
   }
 };
 
-// ============================================
-// ACCEPT BOOKING (Teacher accepts)
-// ============================================
 export const acceptBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -169,33 +145,29 @@ export const acceptBooking = async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    // Check if user is the teacher
     if (booking.teacherId.toString() !== teacherId) {
-      return res.status(403).json({ 
-        message: "Only the teacher can accept this booking" 
+      return res.status(403).json({
+        message: "Only the teacher can accept this booking"
       });
     }
 
-    // Check if booking is pending
     if (booking.status !== "pending") {
-      return res.status(400).json({ 
-        message: `Booking is already ${booking.status}` 
+      return res.status(400).json({
+        message: `Booking is already ${booking.status}`
       });
     }
 
-    // Update booking
     booking.status = "accepted";
     booking.teacherResponse = teacherResponse || "";
     booking.meetingLink = meetingLink || "";
     await booking.save();
 
-    // If classId is provided, add student to the class
     if (classId) {
       const Class = (await import("../models/classModel.js")).default;
       const classData = await Class.findById(classId);
-      
+
       if (classData) {
-        // Add student to class if not already enrolled
+
         if (!classData.students.includes(booking.learnerId)) {
           classData.students.push(booking.learnerId);
           await classData.save();
@@ -218,9 +190,6 @@ export const acceptBooking = async (req, res) => {
   }
 };
 
-// ============================================
-// REJECT BOOKING (Teacher rejects)
-// ============================================
 export const rejectBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -232,29 +201,25 @@ export const rejectBooking = async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    // Check if user is the teacher
     if (booking.teacherId.toString() !== teacherId) {
-      return res.status(403).json({ 
-        message: "Only the teacher can reject this booking" 
+      return res.status(403).json({
+        message: "Only the teacher can reject this booking"
       });
     }
 
-    // Check if booking is pending
     if (booking.status !== "pending") {
-      return res.status(400).json({ 
-        message: `Booking is already ${booking.status}` 
+      return res.status(400).json({
+        message: `Booking is already ${booking.status}`
       });
     }
 
-    // Refund credit from pending back to available
     const learner = await User.findById(booking.learnerId);
     if (learner) {
-      learner.credits += 1;           // Return to available
-      learner.pendingCredits -= 1;    // Remove from pending
+      learner.credits += 1;
+      learner.pendingCredits -= 1;
       await learner.save();
     }
 
-    // Update booking
     booking.status = "rejected";
     booking.teacherResponse = teacherResponse || "";
     await booking.save();
@@ -274,9 +239,6 @@ export const rejectBooking = async (req, res) => {
   }
 };
 
-// ============================================
-// COMPLETE BOOKING (Mark as completed)
-// ============================================
 export const completeBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -288,36 +250,31 @@ export const completeBooking = async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    // Check if user is part of this booking
-    if (booking.learnerId.toString() !== userId && 
+    if (booking.learnerId.toString() !== userId &&
         booking.teacherId.toString() !== userId) {
-      return res.status(403).json({ 
-        message: "Only the learner or teacher can complete this booking" 
+      return res.status(403).json({
+        message: "Only the learner or teacher can complete this booking"
       });
     }
 
-    // Check if booking is accepted
     if (booking.status !== "accepted") {
-      return res.status(400).json({ 
-        message: "Only accepted bookings can be completed" 
+      return res.status(400).json({
+        message: "Only accepted bookings can be completed"
       });
     }
 
-    // CRITICAL: Transfer credit from learner's pending to teacher's available
     const learner = await User.findById(booking.learnerId);
     const teacher = await User.findById(booking.teacherId);
 
     if (learner && teacher) {
-      // Remove from learner's pending (credit is now spent)
+
       learner.pendingCredits -= 1;
       await learner.save();
 
-      // Add to teacher's available credits (they earned it!)
       teacher.credits += 1;
       await teacher.save();
     }
 
-    // Update booking
     booking.status = "completed";
     if (meetingNotes) {
       booking.meetingNotes = meetingNotes;
@@ -346,9 +303,6 @@ export const completeBooking = async (req, res) => {
   }
 };
 
-// ============================================
-// CANCEL BOOKING (Learner cancels)
-// ============================================
 export const cancelBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -359,31 +313,27 @@ export const cancelBooking = async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    // Check if user is the learner
     if (booking.learnerId.toString() !== learnerId) {
-      return res.status(403).json({ 
-        message: "Only the learner can cancel this booking" 
+      return res.status(403).json({
+        message: "Only the learner can cancel this booking"
       });
     }
 
-    // Check if booking can be cancelled
     if (booking.status === "completed") {
-      return res.status(400).json({ 
-        message: "Cannot cancel a completed booking" 
+      return res.status(400).json({
+        message: "Cannot cancel a completed booking"
       });
     }
 
-    // Refund credit from pending if booking was pending or accepted
     if (booking.status === "pending" || booking.status === "accepted") {
       const learner = await User.findById(learnerId);
       if (learner) {
-        learner.credits += 1;           // Return to available
-        learner.pendingCredits -= 1;    // Remove from pending
+        learner.credits += 1;
+        learner.pendingCredits -= 1;
         await learner.save();
       }
     }
 
-    // Update booking
     booking.status = "cancelled";
     await booking.save();
 
@@ -402,14 +352,10 @@ export const cancelBooking = async (req, res) => {
   }
 };
 
-// ============================================
-// GET BOOKING STATS (for dashboard)
-// ============================================
 export const getBookingStats = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // As learner
     const asLearner = {
       total: await Booking.countDocuments({ learnerId: userId }),
       pending: await Booking.countDocuments({ learnerId: userId, status: "pending" }),
@@ -417,7 +363,6 @@ export const getBookingStats = async (req, res) => {
       completed: await Booking.countDocuments({ learnerId: userId, status: "completed" })
     };
 
-    // As teacher
     const asTeacher = {
       total: await Booking.countDocuments({ teacherId: userId }),
       pending: await Booking.countDocuments({ teacherId: userId, status: "pending" }),

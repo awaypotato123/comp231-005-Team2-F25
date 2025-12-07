@@ -181,7 +181,7 @@ export const addCreditsToUser = async (req, res) => {
   }
 };
 
-// Reset user password
+
 export const resetUserPassword = async (req, res) => {
   try {
     const { newPassword } = req.body;
@@ -222,7 +222,7 @@ export const getAllSkillsAdmin = async (req, res) => {
   try {
     const { page = 1, limit = 10, category, level, search } = req.query;
 
-    // Build query
+    
     let query = {};
     
     if (category) {
@@ -240,7 +240,7 @@ export const getAllSkillsAdmin = async (req, res) => {
       ];
     }
 
-    // Execute query with pagination
+   
     const skills = await Skill.find(query)
       .populate("userId", "firstName lastName email role")
       .limit(limit * 1)
@@ -261,7 +261,7 @@ export const getAllSkillsAdmin = async (req, res) => {
   }
 };
 
-// Delete skill (admin)
+
 export const deleteSkillAdmin = async (req, res) => {
   try {
     const skillId = req.params.id;
@@ -271,12 +271,12 @@ export const deleteSkillAdmin = async (req, res) => {
       return res.status(404).json({ message: "Skill not found" });
     }
 
-    // Remove skill from user's skills array
+
     await User.findByIdAndUpdate(skill.userId, {
       $pull: { skills: skillId }
     });
 
-    // Delete the skill
+   
     await Skill.findByIdAndDelete(skillId);
 
     res.status(200).json({ 
@@ -292,21 +292,21 @@ export const deleteSkillAdmin = async (req, res) => {
 
 export const getAdminStats = async (req, res) => {
   try {
-    // Get counts
+   
     const totalUsers = await User.countDocuments();
     const totalSkills = await Skill.countDocuments();
     const totalLearners = await User.countDocuments({ role: "learner" });
     const totalTeachers = await User.countDocuments({ role: "teacher" });
     const totalAdmins = await User.countDocuments({ role: "admin" });
 
-    // Get recent users (last 7 days)
+    
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const recentUsers = await User.countDocuments({
       createdAt: { $gte: sevenDaysAgo }
     });
 
-    // Get recent skills (last 7 days)
+    
     const recentSkills = await Skill.countDocuments({
       createdAt: { $gte: sevenDaysAgo }
     });

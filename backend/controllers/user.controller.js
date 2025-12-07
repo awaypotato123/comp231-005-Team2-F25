@@ -1,12 +1,11 @@
 import User from "../models/User.js";
 
-
 export const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
       .select("-password -salt")
       .populate("skills", "title category level");
-    
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -18,28 +17,23 @@ export const getCurrentUser = async (req, res) => {
   }
 };
 
-
 export const updateProfile = async (req, res) => {
   try {
     const { firstName, lastName, bio, profilePicture } = req.body;
     const userId = req.user.id;
 
-    // Find user
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    
     if (firstName) user.firstName = firstName.trim();
     if (lastName) user.lastName = lastName.trim();
     if (bio !== undefined) user.bio = bio.trim();
     if (profilePicture !== undefined) user.profilePicture = profilePicture;
 
-    
     const updatedUser = await user.save();
 
-  
     const safeUser = updatedUser.toObject();
     delete safeUser.password;
     delete safeUser.salt;
@@ -54,25 +48,23 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-// Update password
 export const updatePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user.id;
 
     if (!currentPassword || !newPassword) {
-      return res.status(400).json({ 
-        message: "Please provide current and new password" 
+      return res.status(400).json({
+        message: "Please provide current and new password"
       });
     }
 
     if (newPassword.length < 6) {
-      return res.status(400).json({ 
-        message: "New password must be at least 6 characters" 
+      return res.status(400).json({
+        message: "New password must be at least 6 characters"
       });
     }
 
-   
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -83,9 +75,8 @@ export const updatePassword = async (req, res) => {
       return res.status(400).json({ message: "Current password is incorrect" });
     }
 
-    
     user.password = newPassword;
-    await user.save(); 
+    await user.save();
 
     res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
@@ -93,7 +84,6 @@ export const updatePassword = async (req, res) => {
     res.status(500).json({ message: "Server error updating password" });
   }
 };
-
 
 export const getUserStats = async (req, res) => {
   try {
@@ -148,7 +138,6 @@ export const updateUserCreds = async (req, res) => {
     const userId = req.user.id;
     const { credits } = req.body;
 
-    // Validate input
     if (credits === undefined || isNaN(credits)) {
       return res.status(400).json({ message: "Invalid or missing credit value" });
     }
@@ -157,7 +146,6 @@ export const updateUserCreds = async (req, res) => {
       return res.status(400).json({ message: "Credits cannot be negative" });
     }
 
-    // Update ONLY credits
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { credits },
@@ -189,7 +177,7 @@ export const updateCreditsById = async (req, res) => {
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { $inc: { credits } },       // increment by the amount
+      { $inc: { credits } },
       { new: true }
     ).select("credits");
 

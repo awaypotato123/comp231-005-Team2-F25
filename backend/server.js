@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import cors from "cors";
 
-// Routes
 import authRoutes from "./routes/auth.route.js";
 import skillRoutes from "./routes/skill.route.js";
 import userRoutes from "./routes/user.route.js";
@@ -13,23 +12,20 @@ import classPostsRoutes from "./routes/classpost.route.js";
 import feedbackRoutes from "./routes/feedback.route.js";
 import bookingRoutes from './routes/booking.route.js';
 
-// Load environment variables FIRST
 dotenv.config();
 
-// Verify environment variables
 console.log("=== Environment Variables Check ===");
 console.log("JWT_SECRET:", process.env.JWT_SECRET ? "✓ Loaded" : "✗ MISSING");
 console.log("MONGO_URL:", process.env.MONGO_URL ? "✓ Loaded" : "✗ MISSING");
 console.log("PORT:", process.env.PORT || "3000 (default)");
 console.log("===================================");
 
-// Connect to MongoDB
 connectDB();
 
 const app = express();
 
-app.use(express.json());   // JSON parsing
-app.use(cors());           // Enable CORS
+app.use(express.json());
+app.use(cors());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/skills", skillRoutes);
@@ -40,7 +36,6 @@ app.use("/api/classposts", classPostsRoutes);
 app.use("/api/feedbacks", feedbackRoutes);
 app.use('/api/bookings', bookingRoutes);
 
-// Home route
 app.get("/", (req, res) => {
   res.send("API is running...");
 });

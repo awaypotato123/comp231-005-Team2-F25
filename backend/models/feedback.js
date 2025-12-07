@@ -1,30 +1,30 @@
 import mongoose from 'mongoose';
 
 const feedbackSchema = new mongoose.Schema({
-    classId: { 
-        type: mongoose.Schema.Types.ObjectId, 
+    classId: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Class',
         required: true
     },
-    instructorId: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User',  // Referencing the User model (Instructor)
-        required: true 
-    },
-    studentId: {        
+    instructorId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Referencing the User model (Student)
-        required: true, 
-    },
-    rating: { 
-        type: Number, 
+        ref: 'User',
         required: true
     },
-    comments: { 
-        type: String, 
-        required: true 
+    studentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
+    rating: {
+        type: Number,
+        required: true
+    },
+    comments: {
+        type: String,
+        required: true
     }
-}, { timestamps: true });  // Automatically adds createdAt and updatedAt
+}, { timestamps: true });
 
 const Feedback = mongoose.model('Feedback', feedbackSchema);
 

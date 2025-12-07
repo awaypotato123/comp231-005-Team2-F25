@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-// Schema for a student request
+
 const requestSchema = new mongoose.Schema({
     student: {
         type: mongoose.Schema.Types.ObjectId,
@@ -39,7 +39,7 @@ const skillSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
-        // NEW: Array of pending requests from students
+        
         pendingRequests: [requestSchema],
     },
     { timestamps: true }

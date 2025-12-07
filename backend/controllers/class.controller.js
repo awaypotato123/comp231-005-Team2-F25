@@ -1,19 +1,18 @@
 import express from 'express';
-import Class from '../models/classModel.js';  
-import Skill from '../models/Skill.js';  
-import User from '../models/User.js';  
+import Class from '../models/classModel.js';
+import Skill from '../models/Skill.js';
+import User from '../models/User.js';
 
 const router = express.Router();
 
-// ------------------------------ CREATE CLASS ------------------------------
 export const createClass = async (req, res) => {
     try {
         const { title, description, skillId, date, maxStudents } = req.body;
         const userId = req.user.id;
 
         if (!title || !skillId || !date || !maxStudents) {
-            return res.status(400).json({ 
-                message: "Missing required fields: title, skillId, date, and maxStudents are required" 
+            return res.status(400).json({
+                message: "Missing required fields: title, skillId, date, and maxStudents are required"
             });
         }
 
@@ -24,7 +23,7 @@ export const createClass = async (req, res) => {
 
         const userFullName = `${user.firstName} ${user.lastName}`;
         const skill = await Skill.findOne({ _id: skillId, userId });
-        
+
         if (!skill) {
             return res.status(400).json({ message: "Skill not found or does not belong to you" });
         }
@@ -47,7 +46,6 @@ export const createClass = async (req, res) => {
     }
 };
 
-// ------------------------------ GET ALL CLASSES ------------------------------
 export const getClasses = async (req, res) => {
     try {
         const classes = await Class.find().populate('skill', 'title');
@@ -62,7 +60,6 @@ export const getClasses = async (req, res) => {
     }
 };
 
-// ------------------------------ GET SINGLE CLASS ------------------------------
 export const getClassById = async (req, res) => {
     try {
         const { classId } = req.params;
@@ -71,7 +68,7 @@ export const getClassById = async (req, res) => {
         const classData = await Class.findById(classId)
             .populate('skill', 'title category level')
             .populate('students', 'firstName lastName email');
-        
+
         if (!classData) {
             return res.status(404).json({ message: "Class not found" });
         }
@@ -80,8 +77,8 @@ export const getClassById = async (req, res) => {
         const isEnrolled = classData.students.some(student => student._id.toString() === userId);
 
         if (!isInstructor && !isEnrolled) {
-            return res.status(403).json({ 
-                message: "You are not authorized to view this class. Please request to join first." 
+            return res.status(403).json({
+                message: "You are not authorized to view this class. Please request to join first."
             });
         }
 
@@ -92,7 +89,6 @@ export const getClassById = async (req, res) => {
     }
 };
 
-// ------------------------------ UPDATE CLASS ------------------------------
 export const updateClass = async (req, res) => {
     try {
         const { classId } = req.params;
@@ -127,7 +123,6 @@ export const updateClass = async (req, res) => {
     }
 };
 
-// ------------------------------ DELETE CLASS ------------------------------
 export const deleteClass = async (req, res) => {
     try {
         const { classId } = req.params;
@@ -143,7 +138,6 @@ export const deleteClass = async (req, res) => {
     }
 };
 
-// ------------------------------ JOIN CLASS WITH PENDING CREDITS ------------------------------
 export const joinClass = async (req, res) => {
     try {
         const { classId } = req.params;
@@ -174,21 +168,19 @@ export const joinClass = async (req, res) => {
         }
 
         if (student.credits < 1) {
-            return res.status(400).json({ 
-                message: "Insufficient credits. You need 1 credit to join a class." 
+            return res.status(400).json({
+                message: "Insufficient credits. You need 1 credit to join a class."
             });
         }
 
-        // Move credit to pending
         student.credits -= 1;
         student.pendingCredits += 1;
         await student.save();
 
-        // Add student to class
         classData.students.push(userId);
         await classData.save();
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: "Successfully joined the class! 1 credit moved to pending.",
             class: classData,
             studentCredits: {
@@ -202,7 +194,6 @@ export const joinClass = async (req, res) => {
     }
 };
 
-// ------------------------------ COMPLETE CLASS (Transfer Credits) ------------------------------
 export const completeClass = async (req, res) => {
     try {
         const { classId } = req.params;
@@ -213,21 +204,18 @@ export const completeClass = async (req, res) => {
             return res.status(404).json({ message: "Class not found" });
         }
 
-        // Only instructor can mark class as complete
         if (classData.user.toString() !== userId) {
-            return res.status(403).json({ 
-                message: "Only the instructor can mark this class as complete" 
+            return res.status(403).json({
+                message: "Only the instructor can mark this class as complete"
             });
         }
 
-        // Check if already completed
         if (classData.completed) {
-            return res.status(400).json({ 
-                message: "This class has already been marked as complete" 
+            return res.status(400).json({
+                message: "This class has already been marked as complete"
             });
         }
 
-        // Transfer credits from all students' pending to instructor
         const instructor = await User.findById(userId);
         const students = await User.find({ _id: { $in: classData.students } });
 
@@ -240,11 +228,9 @@ export const completeClass = async (req, res) => {
             }
         }
 
-        // Add credits to instructor
         instructor.credits += totalCredits;
         await instructor.save();
 
-        // Mark class as completed
         classData.completed = true;
         await classData.save();
 
@@ -259,7 +245,6 @@ export const completeClass = async (req, res) => {
     }
 };
 
-// ------------------------------ GET CLASSES USER IS ENROLLED IN ------------------------------
 export const getUserClasses = async (req, res) => {
     try {
         const userId = req.user.id;
@@ -277,7 +262,6 @@ export const getUserClasses = async (req, res) => {
     }
 };
 
-// ------------------------------ GET USER-CREATED CLASSES ------------------------------
 export const getMyCreatedClasses = async (req, res) => {
     try {
         const userId = req.user.id;
@@ -297,7 +281,6 @@ export const getMyCreatedClasses = async (req, res) => {
     }
 };
 
-// ------------------------------ GET STUDENTS IN A CLASS ------------------------------
 export const getClassStudents = async (req, res) => {
     try {
         const { classId } = req.params;
@@ -315,7 +298,6 @@ export const getClassStudents = async (req, res) => {
     }
 };
 
-// ------------------------------ GET CLASS FOR STUDENT ------------------------------
 export const getClassForStudent = async (req, res) => {
     try {
         const { classId } = req.params;
@@ -329,7 +311,7 @@ export const getClassForStudent = async (req, res) => {
             return res.status(404).json({ message: "Class not found." });
         }
 
-        const isEnrolled = classData.students.some(student => student.toString() === studentId); 
+        const isEnrolled = classData.students.some(student => student.toString() === studentId);
 
         if (!isEnrolled) {
             return res.status(403).json({ message: "You are not authorized to view this class." });

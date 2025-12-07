@@ -44,12 +44,12 @@ const UserSchema = new mongoose.Schema({
   },
   credits: {
     type: Number,
-    default: 1,  // Everyone starts with 1 credit
+    default: 1, 
     min: 0
   },
   pendingCredits: {
     type: Number,
-    default: 0,  // Credits held in active bookings
+    default: 0,  
     min: 0
   },
   skills: [
